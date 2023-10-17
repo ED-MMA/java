@@ -43,8 +43,8 @@ public class FileData implements Comparable<FileData> {
         this.path = Paths.get(Globals.ELITE_LOG_HOME, name);
     }
 
-    public byte[] getMD5() {
-        return hash.data;
+    public MD5 getMD5() {
+        return hash;
     }
 
     @Override

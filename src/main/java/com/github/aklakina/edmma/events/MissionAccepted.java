@@ -45,7 +45,7 @@ public class MissionAccepted implements Event {
     }
 
     @Override
-    public boolean registerInDB() {
-        return false;
+    public void process() {
+
     }
 }

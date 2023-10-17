@@ -1,9 +1,12 @@
 package com.github.aklakina.edmma.logicalUnit;
 
+import com.github.aklakina.edmma.base.FileData;
 import com.github.aklakina.edmma.base.Singleton;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.events.Event;
 import org.json.JSONObject;
 
+import java.nio.file.Path;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -19,13 +22,13 @@ public class DataFactory {
         return true;
     }
 
-    public static Event createEvent(JSONObject event) {
+    public static boolean createEvent(JSONObject event) {
         String eventType = event.getString("event");
         Function<JSONObject,Event> eventFactory = eventFactories.get(eventType);
         if (eventFactory == null) {
-            return null;
+            return false;
         }
-        return eventFactory.apply(event);
+        return SingletonFactory.getSingleton(EventHandler.class).addEvent(eventFactory.apply(event));
     }
 
 }
