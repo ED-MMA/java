@@ -1,5 +1,6 @@
 package com.github.aklakina.edmma.events;
 
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
 import org.json.JSONObject;
 
@@ -32,7 +33,7 @@ public class MissionAccepted implements Event {
     boolean winged;
     double reward;
 
-    private static boolean registered = DataFactory.registerEventFactory("MissionAccepted", MissionAccepted::new);
+    private static boolean registered = SingletonFactory.getSingleton(DataFactory.class).registerEventFactory("MissionAccepted", MissionAccepted::new);
 
     public MissionAccepted(JSONObject json) {
         missionID = json.getInt("MissionID");
@@ -45,7 +46,7 @@ public class MissionAccepted implements Event {
     }
 
     @Override
-    public void process() {
-
+    public void run() {
+        System.out.println("Mission accepted: " + this);
     }
 }
