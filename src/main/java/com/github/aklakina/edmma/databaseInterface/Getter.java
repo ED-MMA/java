@@ -14,36 +14,16 @@ public class Getter {
     private final Connector dbInstance = SingletonFactory.getSingleton(Connector.class);
     private final Inserter inserter = SingletonFactory.getSingleton(Inserter.class);
 
-    public TreeSet<FileData> getMetadata() {
-        String sql = "Select * from metadata";
-        ResultSet temp;
-        try(PreparedStatement pstmt = dbInstance.getConnection().prepareStatement(sql)) {
-            temp = pstmt.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error occurred during read from db");
-            System.out.println(e.getMessage());
-            return null;
-        }
-        TreeSet<FileData> res=new TreeSet<>();
-        try {
-            while (temp.next()) {
-                res.add(new FileData(temp.getString(0), blobToByte(temp.getBlob(1)), temp.getInt(2)));
-            }
-        } catch (SQLException e) {
-            System.out.println("Error occurred during parsing data");
-            System.out.println(e.getMessage());
-            return null;
-        }
-        return res;
-    }
-
-    public String getFile(String name) {
+    public FileData getFile(String name) {
         String sql = "Select * from metadata where fileName = ?";
         ResultSet temp;
         try(PreparedStatement pstmt = dbInstance.getConnection().prepareStatement(sql)) {
             pstmt.setString(0, name);
             temp = pstmt.executeQuery();
-            return temp.getString(0);
+            if (!temp.next()) {
+                return new FileData(name, 0, 0);
+            }
+            return new FileData(temp.getString(0), temp.getInt(1), temp.getInt(2));
         } catch (SQLException e) {
             System.out.println("Error occurred during read from db");
             System.out.println(e.getMessage());
@@ -71,14 +51,4 @@ public class Getter {
         }
 
     }
-    private byte[] blobToByte(Blob blob) {
-        try {
-            int blobLength = (int) blob.length();
-            return blob.getBytes(1, blobLength);
-        } catch (SQLException e) {
-            return null;
-        }
-    }
-
-
 }

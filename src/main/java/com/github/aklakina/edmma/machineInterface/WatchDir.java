@@ -32,6 +32,8 @@ package com.github.aklakina.edmma.machineInterface;
  */
 
 import com.github.aklakina.edmma.base.*;
+import com.github.aklakina.edmma.logicalUnit.DataFactory;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -123,6 +125,12 @@ public class WatchDir implements Runnable {
 
                 // print out event
                 System.out.format("%s: %s\n", event.kind().name(), child);
+
+                SingletonFactory.getSingleton(DataFactory.class).spawnEvent(
+                        new JSONObject()
+                                .put("event", "fileChanged")
+                                .put("path", child.toString())
+                );
 
             }
 

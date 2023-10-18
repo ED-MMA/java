@@ -1,6 +1,7 @@
 package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.Singleton;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.events.Event;
 import org.json.JSONObject;
 
@@ -11,7 +12,7 @@ import java.util.function.Function;
 public class DataFactory {
     private static TreeMap<String, Function<JSONObject,Event>> eventFactories = new TreeMap<>();
 
-    public static boolean registerEventFactory(String eventType, Function<JSONObject,Event> eventFactory) {
+    public boolean registerEventFactory(String eventType, Function<JSONObject,Event> eventFactory) {
         if (eventFactories.containsKey(eventType)) {
             return false;
         }
@@ -19,13 +20,13 @@ public class DataFactory {
         return true;
     }
 
-    public static Event createEvent(JSONObject event) {
+    public boolean spawnEvent(JSONObject event) {
         String eventType = event.getString("event");
         Function<JSONObject,Event> eventFactory = eventFactories.get(eventType);
         if (eventFactory == null) {
-            return null;
+            return false;
         }
-        return eventFactory.apply(event);
+        return SingletonFactory.getSingleton(EventHandler.class).addEvent(eventFactory.apply(event));
     }
 
 }
