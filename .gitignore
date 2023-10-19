@@ -39,5 +39,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/.idea/dataSources.xml
 /EDMMA.mv.db
 /EDMMA.trace.db
