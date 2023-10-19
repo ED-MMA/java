@@ -4,7 +4,7 @@ import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
 import org.json.JSONObject;
 
-public class MissionAccepted implements Event {
+public class MissionAccepted extends Event {
 
     /*{ "timestamp":"2021-03-10T14:58:54Z"
      *  , "event":"MissionAccepted"
@@ -32,8 +32,6 @@ public class MissionAccepted implements Event {
     String expiry;
     boolean winged;
     double reward;
-
-    private static boolean registered = SingletonFactory.getSingleton(DataFactory.class).registerEventFactory("MissionAccepted", MissionAccepted::new);
 
     public MissionAccepted(JSONObject json) {
         missionID = json.getInt("MissionID");
