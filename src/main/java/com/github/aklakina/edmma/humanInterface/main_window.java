@@ -1,7 +1,6 @@
 package com.github.aklakina.edmma.humanInterface;
 
 import com.github.aklakina.edmma.base.SingletonFactory;
-import com.github.aklakina.edmma.databaseInterface.Inserter;
 import com.github.aklakina.edmma.machineInterface.WatchDir;
 
 import javax.swing.*;

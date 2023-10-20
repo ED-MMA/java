@@ -1,9 +1,8 @@
 package com.github.aklakina.edmma.machineInterface;
 
-import com.github.aklakina.edmma.base.FileData;
+import com.github.aklakina.edmma.database.orms.FileData;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
-import com.github.aklakina.edmma.logicalUnit.EventHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 

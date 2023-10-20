@@ -1,4 +1,6 @@
-package com.github.aklakina.edmma.base;
+package com.github.aklakina.edmma.database.orms;
+
+import com.github.aklakina.edmma.base.Globals;
 
 import java.io.File;
 import java.io.IOException;

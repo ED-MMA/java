@@ -1,11 +1,11 @@
 package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.*;
-import com.github.aklakina.edmma.databaseInterface.Getter;
+import com.github.aklakina.edmma.database.orms.FileData;
+import com.github.aklakina.edmma.database.Getter;
 import com.github.aklakina.edmma.machineInterface.FileReader;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 @Singleton
