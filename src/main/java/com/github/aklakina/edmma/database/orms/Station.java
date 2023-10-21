@@ -11,7 +11,7 @@ public class Station {
     public Station() {
     }
 
-    private SourceSystem sourceSystem;
+    private System system;
 
     private Long id;
     private String name;
@@ -28,12 +28,12 @@ public class Station {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public SourceSystem getSourceSystem() {
-        return sourceSystem;
+    public System getSystem() {
+        return system;
     }
 
-    public void setSourceSystem(SourceSystem sourceSystem) {
-        this.sourceSystem = sourceSystem;
+    public void setSystem(System system) {
+        this.system = system;
     }
 
     @OneToMany(mappedBy = MissionSource_.STATION)

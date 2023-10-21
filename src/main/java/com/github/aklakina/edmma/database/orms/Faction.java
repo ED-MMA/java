@@ -5,33 +5,23 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "SOURCESYSTEM", schema = "ED")
-public class SourceSystem {
+@Table(name = "FACTION", schema = "ED")
+public class Faction {
+    public Faction() {
 
-    public SourceSystem() {
     }
 
     private Long id;
-
-    private Set<Station> station;
     private String name;
+    private Set<MissionSource> missionSources;
     private Set<Cluster> clusters;
 
-    @OneToMany(mappedBy = Station_.SOURCE_SYSTEM)
-    public Set<Station> getStation() {
-        return station;
-    }
-
-    public void setStation(Set<Station> station) {
-        this.station = station;
-    }
-
     @Id
-    public Long getId() {
+    public Long getID() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setID(Long id) {
         this.id = id;
     }
 
@@ -40,11 +30,11 @@ public class SourceSystem {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name){
         this.name = name;
     }
 
-    @OneToMany(mappedBy = Cluster_.SOURCE_SYSTEM)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = Cluster_.TARGET_FACTION)
     public Set<Cluster> getClusters() {
         return clusters;
     }
@@ -53,12 +43,22 @@ public class SourceSystem {
         this.clusters = clusters;
     }
 
+    @OneToMany(mappedBy = MissionSource_.FACTION)
+    public Set<MissionSource> getMissionSources() {
+        return missionSources;
+    }
+
+    public void setMissionSources(Set<MissionSource> missionSources) {
+        this.missionSources = missionSources;
+    }
+
+
     public int hashCode() {
         return id.hashCode();
     }
 
     public boolean equals(Object o) {
-        return o instanceof SourceSystem && id.equals(((SourceSystem) o).id);
+        return o instanceof Faction && id.equals(((Faction) o).id);
     }
 
 }

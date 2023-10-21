@@ -1,5 +1,6 @@
 package com.github.aklakina.edmma.humanInterface;
 
+import com.github.aklakina.edmma.base.ClassLoader;
 import com.github.aklakina.edmma.database.*;
 
 import com.github.aklakina.edmma.base.SingletonFactory;
@@ -33,18 +34,18 @@ public class main_window {
     private static final ORMConfig ormConfig = SingletonFactory.getSingleton(ORMConfig.class);
 
     public static void main(String[] args) {
+        //ClassLoader temp = Event.eventLoader;
         JFrame frame = new JFrame("EDMMA");
         frame.setContentPane(new main_window().panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-
-        Event.eventLoader.registered.forEach(System.out::println);
+/*
 
 
         WatchDir watchDir = SingletonFactory.getSingleton(WatchDir.class);
         // run the watchDir in a background thread
         Thread thread = new Thread(watchDir);
-        thread.start();
+        thread.start();*/
     }
 }
