@@ -9,9 +9,9 @@ import java.util.Set;
 public class Cluster {
     public Cluster() {
     }
-
-    private SourceSystem sourceSystem;
-    private TargetFaction targetFaction;
+    private Faction targetFaction;
+    private Set<MissionSource> missionSources;
+    private System targetSystem;
 
     private Long id;
 
@@ -27,20 +27,11 @@ public class Cluster {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public SourceSystem getSourceSystem() {
-        return sourceSystem;
-    }
-
-    public void setSourceSystem(SourceSystem sourceSystem) {
-        this.sourceSystem = sourceSystem;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    public TargetFaction getTargetFaction() {
+    public Faction getTargetFaction() {
         return targetFaction;
     }
 
-    public void setTargetFaction(TargetFaction targetFaction) {
+    public void setTargetFaction(Faction targetFaction) {
         this.targetFaction = targetFaction;
     }
 
@@ -59,6 +50,24 @@ public class Cluster {
 
     public boolean equals(Object o) {
         return o instanceof Cluster && id.equals(((Cluster) o).id);
+    }
+
+    @OneToMany(mappedBy = MissionSource_.CLUSTER)
+    public Set<MissionSource> getMissionSources() {
+        return missionSources;
+    }
+
+    public void setMissionSources(Set<MissionSource> missionSources) {
+        this.missionSources = missionSources;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public System getTargetSystem() {
+        return targetSystem;
+    }
+
+    public void setTargetSystem(System targetSystem) {
+        this.targetSystem = targetSystem;
     }
 
 }

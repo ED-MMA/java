@@ -5,23 +5,33 @@ import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "TARGETFACTION", schema = "ED")
-public class TargetFaction {
-    public TargetFaction() {
+@Table(name = "SYSTEM", schema = "ED")
+public class System {
 
+    public System() {
     }
 
     private Long id;
+
+    private Set<Station> stations;
     private String name;
-    private TargetSystem system;
     private Set<Cluster> clusters;
 
+    @OneToMany(mappedBy = Station_.SYSTEM)
+    public Set<Station> getStations() {
+        return stations;
+    }
+
+    public void setStations(Set<Station> stations) {
+        this.stations = stations;
+    }
+
     @Id
-    public Long getID() {
+    public Long getId() {
         return id;
     }
 
-    public void setID(Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -30,20 +40,11 @@ public class TargetFaction {
         return name;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    public TargetSystem getSystem() {
-        return system;
-    }
-
-    public void setSystem(TargetSystem system) {
-        this.system  = system;
-    }
-
-    @OneToMany(mappedBy = Cluster_.TARGET_FACTION)
+    @OneToMany(mappedBy = Cluster_.TARGET_SYSTEM)
     public Set<Cluster> getClusters() {
         return clusters;
     }
@@ -57,7 +58,7 @@ public class TargetFaction {
     }
 
     public boolean equals(Object o) {
-        return o instanceof TargetFaction && id.equals(((TargetFaction) o).id);
+        return o instanceof System && id.equals(((System) o).id);
     }
 
 }
