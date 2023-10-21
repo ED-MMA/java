@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="EDMMA.sqlite" uuid="f4e830e4-b027-4b03-afcb-dca1539d0967">
-      <driver-ref>sqlite.xerial</driver-ref>
+    <data-source source="LOCAL" name="EDMMA" uuid="bd4e6cb2-0211-4fae-b757-bd152438453f">
+      <driver-ref>h2.unified</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:EDMMA.sqlite</jdbc-url>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:$PROJECT_DIR$/EDMMA</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

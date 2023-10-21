@@ -1,11 +1,9 @@
 package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.*;
-import com.github.aklakina.edmma.databaseInterface.Getter;
 import com.github.aklakina.edmma.machineInterface.FileReader;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 @Singleton
@@ -17,8 +15,9 @@ public class FileHandler {
         if (fileReaders.containsKey(path)) {
             fileReaders.get(path).changed();
         } else {
-            FileData temp = SingletonFactory.getSingleton(Getter.class).getFile(path.getFileName().toString());
-            fileReaders.put(path, new FileReader(temp));
+            //FileData temp = SingletonFactory.getSingleton(Getter.class).getFile(path.getFileName().toString());
+            //fileReaders.put(path, new FileReader(temp));
+            System.out.println("Not implemented yet");
         }
     }
 

@@ -1,9 +1,8 @@
 package com.github.aklakina.edmma.machineInterface;
 
-import com.github.aklakina.edmma.base.FileData;
+import com.github.aklakina.edmma.database.orms.FileData;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
-import com.github.aklakina.edmma.logicalUnit.EventHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +38,7 @@ public class FileReader {
     public FileReader(FileData file) {
         this.file = file;
         try {
-            FileInputStream fileInputStream = new FileInputStream(file);
+            FileInputStream fileInputStream = new FileInputStream(file.toNative());
             reader = new BufferedReader(new InputStreamReader(fileInputStream));
             this.changed();
         } catch (Exception e) {
@@ -50,7 +49,7 @@ public class FileReader {
     }
 
     public synchronized void changed() {
-        if (file.isChanged()) {
+        if (file.getChanged()) {
             try {
                 String line;
                 while ((line = reader.readLine()) != null) {

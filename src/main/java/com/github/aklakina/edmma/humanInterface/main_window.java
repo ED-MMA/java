@@ -1,7 +1,9 @@
 package com.github.aklakina.edmma.humanInterface;
 
+import com.github.aklakina.edmma.database.*;
+
 import com.github.aklakina.edmma.base.SingletonFactory;
-import com.github.aklakina.edmma.databaseInterface.Inserter;
+import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.machineInterface.WatchDir;
 
 import javax.swing.*;
@@ -27,12 +29,16 @@ public class main_window {
         });
     }
 
+    private static final ORMConfig ormConfig = SingletonFactory.getSingleton(ORMConfig.class);
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("EDMMA");
         frame.setContentPane(new main_window().panel1);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
+        //ORMConfig.sessionFactory.
 
         WatchDir watchDir = SingletonFactory.getSingleton(WatchDir.class);
         // run the watchDir in a background thread

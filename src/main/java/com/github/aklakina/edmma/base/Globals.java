@@ -1,7 +1,5 @@
 package com.github.aklakina.edmma.base;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
-
 import java.util.regex.Pattern;
 
 public class Globals {
