@@ -2,6 +2,7 @@ package com.github.aklakina.edmma.database;
 
 import com.github.aklakina.edmma.base.ClassLoader;
 import com.github.aklakina.edmma.base.Singleton;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
@@ -12,29 +13,37 @@ import java.util.List;
 
 @Singleton
 public class ORMConfig {
-
-    public static final ClassLoader classLoader = new ClassLoader();
-
     public static SessionFactory sessionFactory;
+
+    public static ClassLoader ORMLoader = new ClassLoader() {
+        @Override
+        public void parse(Class<?> clazz) {
+            if (clazz.isAnnotationPresent(jakarta.persistence.Entity.class)) {
+                registered.add(clazz);
+            } else {
+                notRegistered.add(clazz);
+            }
+        }
+        @Override
+        public boolean fileFilter(java.io.File dir, String name) {
+            if (name.endsWith(".class") && !name.endsWith("_.class")) {
+                return true;
+            }
+            return false;
+        }
+    };
 
     static {
         Configuration builder = new Configuration();
-        List<Class<?>> classes;
+
         try {
-            classes = classLoader.loadClassesFromPackage("com.github.aklakina.edmma.database.orms",(dir, name) -> {
-                if (name.endsWith(".class") && !name.endsWith("_.class")) {
-                    return true;
-                }
-                return false;
-            });
+            ORMLoader.loadClassesFromPackage("com.github.aklakina.edmma.database.orms");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            classes = new ArrayList<>();
         }
-        //ORMConfig.class.getClassLoader().loadClass("com.github.aklakina.edmma.database.orms.");
-        for (Class<?> clazz : classes) {
+
+        for (Class<?> clazz : ORMLoader.registered) {
             builder.addAnnotatedClass(clazz);
-            classLoader.registered.put(clazz, true);
         }
         sessionFactory = builder
                 .setProperty("hibernate.connection.url", "jdbc:h2:./EDMMA")

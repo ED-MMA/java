@@ -29,9 +29,11 @@ public class Jump extends Event {
      */
 
     private String StarSystem;
+    private Long id;
 
     public Jump(JSONObject json) {
         StarSystem = json.getString("StarSystem");
+        id = json.getLong("SystemAddress");
     }
 
     @Override

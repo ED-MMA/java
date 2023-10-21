@@ -4,6 +4,7 @@ import com.github.aklakina.edmma.database.*;
 
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.ORMConfig;
+import com.github.aklakina.edmma.events.Event;
 import com.github.aklakina.edmma.machineInterface.WatchDir;
 
 import javax.swing.*;
@@ -38,7 +39,8 @@ public class main_window {
         frame.pack();
         frame.setVisible(true);
 
-        //ORMConfig.sessionFactory.
+        Event.eventLoader.registered.forEach(System.out::println);
+
 
         WatchDir watchDir = SingletonFactory.getSingleton(WatchDir.class);
         // run the watchDir in a background thread

@@ -1,15 +1,14 @@
 package com.github.aklakina.edmma.base;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-public class ClassLoader {
+public abstract class ClassLoader {
 
-    public List<Class<?>> loadClassesFromPackage(String packageName,  java.io.FilenameFilter filter) throws IOException, ClassNotFoundException {
+    private static File[] getClassFiles(String packageName, FilenameFilter filter) {
         System.out.println("Loading classes from package " + packageName);
         java.lang.ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace('.', '/');
@@ -17,31 +16,38 @@ public class ClassLoader {
 
         if (packageURL == null) {
             System.out.println("Package " + packageName + " not found");
-            return new ArrayList<>();
+            return null;
         }
 
         File packageDir = new File(packageURL.getFile());
-        File[] classFiles = packageDir.listFiles(filter);
 
-        List<Class<?>> classes = new ArrayList<>();
+        return packageDir.listFiles(filter);
 
-        if (classFiles == null) {
-            System.out.println("No classes found in package " + packageName);
-            return classes;
+    }
+    public abstract void parse(Class<?> clazz);
+
+    public boolean fileFilter(File dir, String name) {
+        if (name.endsWith(".class") && !name.endsWith("_.class")) {
+            return true;
         }
-
-        for (File classFile : classFiles) {
-            String className = packageName + '.' + classFile.getName().replace(".class", "");
-
-            System.out.println("Loading class " + className);
-
-            classes.add(Class.forName(className));
-
-        }
-
-        return classes;
+        return false;
     }
 
-    public HashMap<Class<?>, Boolean> registered = new HashMap<>();
+    public void loadClassesFromPackage(String packageName) throws IOException, ClassNotFoundException {
+        File[] files = getClassFiles(packageName, ClassLoader.this::fileFilter);
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+            String className = packageName + '.' + file.getName().replace(".class", "");
+            parse(Class.forName(className));
+        }
+
+    }
+
+    public Set<Class<?>> registered = new HashSet<>();
+
+    public Set<Class<?>> notRegistered = new HashSet<>();
 
 }
