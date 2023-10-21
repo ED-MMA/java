@@ -1,73 +1,135 @@
 package com.github.aklakina.edmma.database.orms;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
-
-/*
-create table ed.missions
-(
-    missionID       integer not null
-        constraint missions_pk
-            primary key,
-    sourceFactionID integer not null
-        constraint missions_factions_factionID_fk
-            references ed.factions,
-    stationID       integer not null
-        constraint missions_stations_stationID_fk
-            references ed.stations,
-    sourceSystemID  integer not null
-        constraint missions_systems_ID_source_fk
-            references ed.sourceSystems,
-    targetFactionID integer not null
-        constraint missions_factions_factionID_target_fk
-            references ed.factions,
-    targetSystemID  integer not null
-        constraint missions_systems_ID_target_fk
-            references ed.sourceSystems,
-    killsNeeded     integer not null,
-    killsSoFar      integer default 0,
-    killsLeft       integer generated always as (killsNeeded - killsSoFar) virtual,
-    reward          REAL    not null,
-    completed       INTEGER generated always as (killsLeft <= 0) virtual,
-    winged          integer not null,
-    acceptanceTime  TEXT    not null,
-    expiresAt       TEXT    not null
-)
-    without rowid;
- */
+import jakarta.persistence.*;
+import org.hibernate.annotations.Formula;
 
 @Entity
+@Table(name = "MISSION", schema = "ED")
 public class Mission {
-    @Id
-    private long ID;
 
-    private long sourceFactionID;
+    public Mission() {
+    }
 
-    private long stationID;
-
-    private long sourceSystemID;
-
-    private long targetFactionID;
-
-    private long targetSystemID;
-
-    private long killsNeeded;
-
-    private long killsSoFar;
-
-    private long killsLeft;
+    private Long id;
+    private Cluster cluster;
+    private MissionSource source;
 
     private double reward;
+    private boolean shareable;
+    private int killsRequired;
+    private int progress;
 
-    private long completed;
-
-    private long winged;
-
-    private String acceptanceTime;
-
-    private String expiresAt;
+    private String expiry;
+    private String acceptTime;
+    private boolean completed;
+    private int killsLeft;
 
 
+    @Id
+    public Long getID() {
+        return id;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Cluster getCluster() {
+        return cluster;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public MissionSource getSource() {
+        return source;
+    }
+
+    @Basic(optional = false)
+    public double getReward() {
+        return reward;
+    }
+
+    @Basic(optional = false)
+    public boolean isShareable() {
+        return shareable;
+    }
+
+    @Basic(optional = false)
+    public int getKillsRequired() {
+        return killsRequired;
+    }
+
+    @Basic
+    public int getProgress() {
+        return progress;
+    }
+
+    @Formula("progress >= killsRequired")
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    @Formula("killsRequired - progress")
+    public int getKillsLeft() {
+        return killsLeft;
+    }
+
+    @Basic(optional = false)
+    public String getExpiry() {
+        return expiry;
+    }
+
+    @Basic(optional = false)
+    public String getAcceptTime() {
+        return acceptTime;
+    }
+
+    public void setID(Long id) {
+        this.id = id;
+    }
+
+    public void setCluster(Cluster cluster) {
+        this.cluster = cluster;
+    }
+
+    public void setSource(MissionSource source) {
+        this.source = source;
+    }
+
+    public void setReward(double reward) {
+        this.reward = reward;
+    }
+
+    public void setShareable(boolean shareable) {
+        this.shareable = shareable;
+    }
+
+    public void setKillsRequired(int killsRequired) {
+        this.killsRequired = killsRequired;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public void setKillsLeft(int killsLeft) {
+        this.killsLeft = killsLeft;
+    }
+
+    public void setExpiry(String expiry) {
+        this.expiry = expiry;
+    }
+
+    public void setAcceptTime(String acceptTime) {
+        this.acceptTime = acceptTime;
+    }
+
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        return o instanceof Mission && id.equals(((Mission) o).id);
+    }
 
 }

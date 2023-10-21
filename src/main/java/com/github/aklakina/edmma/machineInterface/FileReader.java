@@ -38,7 +38,7 @@ public class FileReader {
     public FileReader(FileData file) {
         this.file = file;
         try {
-            FileInputStream fileInputStream = new FileInputStream(file);
+            FileInputStream fileInputStream = new FileInputStream(file.toNative());
             reader = new BufferedReader(new InputStreamReader(fileInputStream));
             this.changed();
         } catch (Exception e) {
@@ -49,7 +49,7 @@ public class FileReader {
     }
 
     public synchronized void changed() {
-        if (file.isChanged()) {
+        if (file.getChanged()) {
             try {
                 String line;
                 while ((line = reader.readLine()) != null) {

@@ -1,30 +1,34 @@
 package com.github.aklakina.edmma.database.orms;
 
+
 import com.github.aklakina.edmma.base.Globals;
 
+import jakarta.persistence.*;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-public class FileData extends File {
+@Entity
+@Table(name = "FILE", schema = "MD")
+public class FileData {
 
+    public FileData() {
+    }
+
+    @Transient
+    private File file;
     private String name;
     private Integer lastLineRead;
     private long lastSize;
 
     public FileData(String name, Integer lastLineRead, long lastSize) {
-        super(Paths.get(Globals.ELITE_LOG_HOME, name).toString());
+        this.file = new File(Paths.get(Globals.ELITE_LOG_HOME, name).toString());
         this.lastLineRead = lastLineRead;
         this.name = name;
         this.lastSize = lastSize;
     }
 
+    @Basic
     public Integer getLastLineRead() {
         return lastLineRead;
     }
@@ -33,12 +37,50 @@ public class FileData extends File {
         this.lastLineRead = lastLineRead;
     }
 
-    public boolean isChanged() {
-        return this.length() != lastSize;
+    @Transient
+    public boolean getChanged() {
+        return file.length() != lastSize;
     }
 
+    private void setChanged(boolean changed) {}
+
+    @Transient
     public void reCalcSize() {
-        lastSize = this.length();
+        lastSize = file.length();
+    }
+
+    @Id
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public File toNative() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    @Basic
+    public long getLastSize() {
+        return lastSize;
+    }
+
+    public void setLastSize(long lastSize) {
+        this.lastSize = lastSize;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        return o instanceof FileData && name.equals(((FileData) o).name);
     }
 
 }
