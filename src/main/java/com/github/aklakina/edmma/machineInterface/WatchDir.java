@@ -49,6 +49,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 @Singleton
 public class WatchDir implements Runnable {
 
+    public boolean shouldExit = false;
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private boolean trace = false;
@@ -94,7 +95,7 @@ public class WatchDir implements Runnable {
      * Process all events for keys queued to the watcher
      */
     public void run() {
-        for (; ; ) {
+        while (!shouldExit) {
 
             // wait for key to be signalled
             WatchKey key;
@@ -128,7 +129,7 @@ public class WatchDir implements Runnable {
 
                 SingletonFactory.getSingleton(DataFactory.class).spawnEvent(
                         new JSONObject()
-                                .put("event", "fileChanged")
+                                .put("event", "FileChanged")
                                 .put("path", child.toString())
                 );
 

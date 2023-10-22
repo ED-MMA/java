@@ -11,9 +11,10 @@ public class MissionSource {
     }
 
     private Long id;
-    private SourceFaction faction;
+    private Faction faction;
     private Station station;
     private Set<Mission> missions;
+    private Cluster cluster;
 
     @Id
     public Long getID() {
@@ -25,11 +26,11 @@ public class MissionSource {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public SourceFaction getFaction() {
+    public Faction getFaction() {
         return faction;
     }
 
-    public void setFaction(SourceFaction sourceFaction) {
+    public void setFaction(Faction sourceFaction) {
         this.faction = sourceFaction;
     }
 
@@ -57,6 +58,15 @@ public class MissionSource {
 
     public boolean equals(Object o) {
         return o instanceof MissionSource && id.equals(((MissionSource) o).id);
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    public Cluster getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(Cluster cluster) {
+        this.cluster = cluster;
     }
 
 }

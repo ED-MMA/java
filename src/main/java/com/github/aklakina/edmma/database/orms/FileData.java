@@ -56,6 +56,7 @@ public class FileData {
 
     public void setName(String name) {
         this.name = name;
+        this.file = new File(Paths.get(Globals.ELITE_LOG_HOME, name).toString());
     }
 
     public File toNative() {
