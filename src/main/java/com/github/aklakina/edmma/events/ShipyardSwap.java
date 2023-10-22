@@ -1,6 +1,8 @@
 package com.github.aklakina.edmma.events;
 
-public class ShipSwap extends Event {
+import org.json.JSONObject;
+
+public class ShipyardSwap extends Event {
     @Override
     public void run() {
 
@@ -14,4 +16,7 @@ public class ShipSwap extends Event {
      * , "StoreShipID":12
      * , "MarketID":3221679616 }
      */
+    public ShipyardSwap(JSONObject json) {
+        // TODO: find out something that actually worth implementing
+    }
 }

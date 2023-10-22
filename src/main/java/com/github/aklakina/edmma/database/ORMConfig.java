@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Singleton
 public class ORMConfig {
     public static SessionFactory sessionFactory;
 
@@ -49,12 +48,17 @@ public class ORMConfig {
                 .setProperty("hibernate.connection.url", "jdbc:h2:./EDMMA")
                 .setProperty("hibernate.connection.driver_class", "org.h2.Driver")
                 .setProperty(AvailableSettings.CONNECTION_PROVIDER, "org.hibernate.hikaricp.internal.HikariCPConnectionProvider")
-                .setProperty("hibernate.hbm2ddl.auto", "create-drop")
+                .setProperty("hibernate.hbm2ddl.auto", "update")
                 .setProperty(AvailableSettings.JAKARTA_HBM2DDL_CREATE_SCHEMAS, "true")
                 .setProperty(AvailableSettings.SHOW_SQL, "true")
                 .setProperty(AvailableSettings.FORMAT_SQL, "true")
                 .setProperty(AvailableSettings.HIGHLIGHT_SQL, "true")
                 .buildSessionFactory();
+
+    }
+
+    public static void close() {
+        sessionFactory.close();
     }
 
 }

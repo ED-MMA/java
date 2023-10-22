@@ -2,15 +2,15 @@ package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.events.Event;
-import org.json.JSONObject;
 
-import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Singleton
 public class EventHandler implements Runnable {
+
+    public boolean shouldExit = false;
 
     private final LinkedBlockingQueue<Event> eventsToProcess = new LinkedBlockingQueue<>();
 
@@ -20,24 +20,21 @@ public class EventHandler implements Runnable {
     }
 
     // Create a thread pool for event processing
-    private final ExecutorService threadPool = Executors.newCachedThreadPool();
+    //private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     @Override
     public void run() {
-        boolean shouldExit = false;
         do {
-            while (!eventsToProcess.isEmpty()) {
-                Event event = null;
-                try {
-                    event = eventsToProcess.take();
-                } catch (InterruptedException e) {
-                    shouldExit = true;
-                    break;
-                }
-                System.out.println("Processing event: " + event);
-                threadPool.submit(event);
+            Event event = null;
+            try {
+                event = eventsToProcess.take();
+            } catch (InterruptedException e) {
+                shouldExit = true;
+                break;
             }
+            System.out.println("Processing event: " + event);
+            event.run();
+
         } while (!shouldExit);
-        threadPool.shutdown();
     }
 }

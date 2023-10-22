@@ -10,22 +10,11 @@ public class Faction {
     public Faction() {
 
     }
-
-    private Long id;
     private String name;
     private Set<MissionSource> missionSources;
     private Set<Cluster> clusters;
 
     @Id
-    public Long getID() {
-        return id;
-    }
-
-    public void setID(Long id) {
-        this.id = id;
-    }
-
-    @Basic(optional=false)
     public String getName() {
         return name;
     }
@@ -54,11 +43,11 @@ public class Faction {
 
 
     public int hashCode() {
-        return id.hashCode();
+        return name.hashCode();
     }
 
     public boolean equals(Object o) {
-        return o instanceof Faction && id.equals(((Faction) o).id);
+        return o instanceof Faction && name.equals(((Faction) o).name);
     }
 
 }

@@ -13,19 +13,9 @@ public class Station {
 
     private System system;
 
-    private Long id;
     private String name;
-
+    private GalacticPosition galacticPosition;
     private Set<MissionSource> missionSources;
-
-    @Id
-    public Long getID() {
-        return id;
-    }
-
-    public void setID(Long id) {
-        this.id = id;
-    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     public System getSystem() {
@@ -45,7 +35,7 @@ public class Station {
         this.missionSources = missionSources;
     }
 
-    @Basic(optional=false)
+    @Id
     public String getName() {
         return name;
     }
@@ -54,12 +44,21 @@ public class Station {
         this.name = name;
     }
 
+    @OneToOne(mappedBy = GalacticPosition_.STATION, optional = true)
+    public GalacticPosition getGalacticPosition() {
+        return galacticPosition;
+    }
+
+    public void setGalacticPosition(GalacticPosition galacticPosition) {
+        this.galacticPosition = galacticPosition;
+    }
+
     public int hashCode() {
-        return id.hashCode();
+        return name.hashCode();
     }
 
     public boolean equals(Object o) {
-        return o instanceof Station && id.equals(((Station) o).id);
+        return o instanceof Station && name.equals(((Station) o).name);
     }
 
 }

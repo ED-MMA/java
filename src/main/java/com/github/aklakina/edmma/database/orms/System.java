@@ -10,12 +10,11 @@ public class System {
 
     public System() {
     }
-
-    private Long id;
-
     private Set<Station> stations;
     private String name;
     private Set<Cluster> clusters;
+    private GalacticPosition galacticPosition;
+
 
     @OneToMany(mappedBy = Station_.SYSTEM)
     public Set<Station> getStations() {
@@ -27,15 +26,6 @@ public class System {
     }
 
     @Id
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Basic(optional=false)
     public String getName() {
         return name;
     }
@@ -53,12 +43,21 @@ public class System {
         this.clusters = clusters;
     }
 
+    @OneToOne(mappedBy = GalacticPosition_.SYSTEM, optional = true)
+    public GalacticPosition getGalacticPosition() {
+        return galacticPosition;
+    }
+
+    public void setGalacticPosition(GalacticPosition galacticPosition) {
+        this.galacticPosition = galacticPosition;
+    }
+
     public int hashCode() {
-        return id.hashCode();
+        return name.hashCode();
     }
 
     public boolean equals(Object o) {
-        return o instanceof System && id.equals(((System) o).id);
+        return o instanceof System && name.equals(((System) o).name);
     }
 
 }

@@ -2,7 +2,9 @@ package com.github.aklakina.edmma.events;
 
 import com.github.aklakina.edmma.base.ClassLoader;
 import com.github.aklakina.edmma.base.SingletonFactory;
+import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
+import org.hibernate.SessionFactory;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -10,6 +12,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 public abstract class Event implements Runnable {
+
+    protected final SessionFactory sessionFactory = ORMConfig.sessionFactory;
+
     public static ClassLoader eventLoader = new ClassLoader() {
         @Override
         public void parse(Class<?> clazz) {
