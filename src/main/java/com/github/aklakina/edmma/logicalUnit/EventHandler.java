@@ -2,6 +2,8 @@ package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.events.Event;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,12 +12,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Singleton
 public class EventHandler implements Runnable {
 
+    private static final Logger logger = LogManager.getLogger(EventHandler.class);
+
     public boolean shouldExit = false;
 
     private final LinkedBlockingQueue<Event> eventsToProcess = new LinkedBlockingQueue<>();
 
     public boolean addEvent(Event event) {
-        System.out.println("Event: " + event);
+        logger.debug("New event: " + event.getClass().getName());
         return eventsToProcess.offer(event);
     }
 
@@ -32,7 +36,6 @@ public class EventHandler implements Runnable {
                 shouldExit = true;
                 break;
             }
-            System.out.println("Processing event: " + event);
             event.run();
 
         } while (!shouldExit);

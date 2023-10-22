@@ -33,6 +33,8 @@ package com.github.aklakina.edmma.machineInterface;
 
 import com.github.aklakina.edmma.base.*;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -48,7 +50,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 
 @Singleton
 public class WatchDir implements Runnable {
-
+    private static final Logger logger = LogManager.getLogger(WatchDir.class);
     public boolean shouldExit = false;
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
@@ -81,10 +83,10 @@ public class WatchDir implements Runnable {
         if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
-                System.out.format("register: %s\n", dir);
+                logger.debug("register: " + dir);
             } else {
                 if (!dir.equals(prev)) {
-                    System.out.format("update: %s -> %s\n", prev, dir);
+                    logger.debug("update: " + prev + " -> " + dir);
                 }
             }
         }
@@ -107,7 +109,7 @@ public class WatchDir implements Runnable {
 
             Path dir = keys.get(key);
             if (dir == null) {
-                System.err.println("WatchKey not recognized!!");
+                logger.error("WatchKey not recognized!!");
                 continue;
             }
 
@@ -125,7 +127,7 @@ public class WatchDir implements Runnable {
                 Path child = dir.resolve(name);
 
                 // print out event
-                System.out.format("%s: %s\n", event.kind().name(), child);
+                logger.debug(event.kind().name() + ": " + child);
 
                 SingletonFactory.getSingleton(DataFactory.class).spawnEvent(
                         new JSONObject()

@@ -1,5 +1,8 @@
 package com.github.aklakina.edmma.base;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -8,14 +11,16 @@ import java.util.*;
 
 public abstract class ClassLoader {
 
+    protected final static Logger logger = LogManager.getLogger(ClassLoader.class);
+
     private static File[] getClassFiles(String packageName, FilenameFilter filter) {
-        System.out.println("Loading classes from package " + packageName);
+        logger.info("Loading classes from package " + packageName);
         java.lang.ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace('.', '/');
         URL packageURL = classLoader.getResource(path);
 
         if (packageURL == null) {
-            System.out.println("Package " + packageName + " not found");
+            logger.debug("Package " + packageName + " not found");
             return null;
         }
 
