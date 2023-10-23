@@ -5,25 +5,32 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{2} - %msg%n"/>
         </Console>
-        <RollingFile name="rolling-file" fileName="EDMMA.log" filePattern="Program-Name-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="app_log" fileName="logs/EDMMA/latest.log" filePattern="logs/EDMMA/log_%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="%d [%t] %-5level %logger{2}.%method:%line - %msg%n"/>
-            <SizeBasedTriggeringPolicy size="1000 KB"/>
+            <OnStartupTriggeringPolicy />
             <DefaultRolloverStrategy max="4"/>
         </RollingFile>
-        <RollingFile name="FILE" fileName="hibernate.log" filePattern="hibernate-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="db_log" fileName="logs/DB/latest.log" filePattern="logs/DB/log_%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="%d [%t] %-5level %logger{5}.%method:%line - %msg%n"/>
-            <SizeBasedTriggeringPolicy size="1000 KB"/>
+            <OnStartupTriggeringPolicy />
             <DefaultRolloverStrategy max="4"/>
         </RollingFile>
     </Appenders>
     <Loggers>
         <logger name="org.hibernate">
-            <level value="ALL" />
-            <AppenderRef ref="FILE"/>
+            <level value="INFO" />
+            <AppenderRef ref="db_log"/>
         </logger>
-        <Root level="info">
+        <logger name="com.zaxxer">
+            <level value="INFO" />
+            <AppenderRef ref="db_log"/>
+        </logger>
+        <logger name="com.github.aklakina">
+            <level value="INFO" />
+            <AppenderRef ref="app_log"/>
+        </logger>
+        <Root level="ALL">
             <AppenderRef ref="console" />
-            <AppenderRef ref="rolling-file" />
         </Root>
     </Loggers>
 </Configuration>
