@@ -6,9 +6,14 @@ import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import com.github.aklakina.edmma.database.orms.System;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 public class FSDJump extends Event {
+
+    private static final Logger logger = LogManager.getLogger(FSDJump.class);
+
     /* { "timestamp":"2022-04-21T20:05:12Z"
      * , "event":"FSDJump"
      * , "StarSystem":"Pegasi Sector XU-O b6-4"
@@ -35,6 +40,7 @@ public class FSDJump extends Event {
     private final String StarSystem;
 
     public FSDJump(JSONObject json) {
+        logger.info("FSDJump event received");
         StarSystem = json.getString("StarSystem");
     }
 
@@ -47,12 +53,14 @@ public class FSDJump extends Event {
         try {
             sys = Queries_.getSystemByName(entityManager, StarSystem);
         } catch (NoResultException e) {
+            logger.debug("System " + StarSystem + " not found in db. Creating new.");
             sys = new System();
             sys.setName(StarSystem);
             entityManager.persist(sys);
         }
 
         if (pos.getSystem() == null || !pos.getSystem().equals(sys)) {
+            logger.debug("Updating galactic position to system: " + sys.getName() + " | station: NULL");
             pos.setSystem(sys);
             pos.setStation(null);
             entityManager.merge(pos);

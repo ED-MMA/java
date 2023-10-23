@@ -3,15 +3,20 @@ package com.github.aklakina.edmma.events;
 import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import jakarta.persistence.EntityManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 public class Undocked extends Event {
+
+    private static final Logger logger = LogManager.getLogger(Undocked.class);
+
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();
         GalacticPosition pos = Globals.GALACTIC_POSITION;
         if (pos.getStation() == null) {
-            System.err.println("Unkown system position. Data inconsistency.");
+            logger.error("Unkown system position. Data inconsistency.");
             return;
         }
         pos.setStation(null);
@@ -27,6 +32,6 @@ public class Undocked extends Event {
      */
 
     public Undocked(JSONObject json) {
-
+        logger.info("Undocked event received");
     }
 }

@@ -42,3 +42,6 @@ build/
 /.idea/dataSources.xml
 /EDMMA.mv.db
 /EDMMA.trace.db
+
+### Generated ###
+/logs/

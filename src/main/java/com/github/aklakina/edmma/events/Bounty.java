@@ -4,6 +4,8 @@ import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Faction;
 import com.github.aklakina.edmma.database.orms.Mission;
 import jakarta.persistence.EntityManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import java.util.HashSet;
@@ -11,8 +13,12 @@ import java.util.List;
 import java.util.Set;
 
 public class Bounty extends Event {
+
+    private static final Logger logger = LogManager.getLogger(Bounty.class);
+
     @Override
     public void run() {
+        logger.info("Bounty event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
 
         List<Mission> missions = Queries_.getMissionByTargetFaction(entityManager, VictimFaction);
@@ -21,7 +27,7 @@ public class Bounty extends Event {
         for (Mission mission : missions) {
             if (factions.add(mission.getSource().getFaction())) {
                 if (mission.isCompleted()) {
-                    java.lang.System.err.println("Mission " + mission.getID() + " should not be completed. Data inconsistency.");
+                    logger.error("Mission " + mission.getID() + " should not be completed. Data inconsistency.");
                 }
                 mission.setProgress(mission.getProgress() + 1);
                 entityManager.merge(mission);
@@ -40,6 +46,7 @@ public class Bounty extends Event {
     private final String VictimFaction;
 
     public Bounty(JSONObject json) {
+        logger.debug("Bounty event received");
         VictimFaction = json.getString("VictimFaction");
     }
 }

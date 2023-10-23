@@ -9,26 +9,40 @@ import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import com.github.aklakina.edmma.machineInterface.WatchDir;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Singleton
 public class Init {
 
+    private static final Logger logger = LogManager.getLogger(Init.class);
+    public boolean initState = true;
+
     Thread fileWatcherThread;
     Thread eventHandlerThread;
     public Init() {
-        System.out.println("Init");
+    }
+
+    public void start() {
+        logger.info("Init class started");
         EntityManager entityManager = ORMConfig.sessionFactory.createEntityManager();
         try {
             Class.forName("com.github.aklakina.edmma.events.Event");
         } catch (ClassNotFoundException e) {
-            System.err.println("Error loading events");
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Event class not found");
+            logger.trace(e.getStackTrace());
         }
         try {
             Globals.GALACTIC_POSITION = Queries_.getGalacticPosition(entityManager, 0L);
         } catch (NoResultException e) {
-            System.out.println("No position found. Creating new.");
+            logger.debug("No galactic position found in db. Creating new.");
             Globals.GALACTIC_POSITION = new GalacticPosition();
             entityManager.getTransaction().begin();
             entityManager.persist(Globals.GALACTIC_POSITION);
@@ -36,17 +50,43 @@ public class Init {
         }
         entityManager.close();
 
+        eventHandlerThread = new Thread(SingletonFactory.getSingleton(EventHandler.class));
+        eventHandlerThread.start();
+
+        processChanges();
+
+        initState = false;
 
         // run the watchDir in a background thread
         fileWatcherThread = new Thread(SingletonFactory.getSingleton(WatchDir.class));
         fileWatcherThread.start();
-        eventHandlerThread = new Thread(SingletonFactory.getSingleton(EventHandler.class));
-        eventHandlerThread.start();
-        /*TODO: Trigger fileChanged event on every file in the directory matching the regexp*/
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            SingletonFactory.getSingleton(AppCloser.class);
-        }));
-
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> SingletonFactory.getSingleton(AppCloser.class)));
     }
+
+    private void processChanges() {
+        File[] files = Paths.get(Globals.ELITE_LOG_HOME).toFile().listFiles((dir, name) -> name.matches(Globals.LOG_FILE_NAME_REGEX.pattern()));
+        if (files == null) {
+            logger.error("No files found");
+            return;
+        }
+        List<File> logs = new ArrayList<>(List.of(files));
+        logs.sort(Comparator.comparing(File::getName));
+        logger.debug("Found files: " + logs);
+        for (File file : logs) {
+            JSONObject data = new JSONObject()
+                    .put("event", "FileChanged")
+                    .put("path", file.getPath());
+            logger.debug("Spawning event: " + data);
+            SingletonFactory.getSingleton(DataFactory.class).spawnEvent(data);
+            synchronized (this) {
+                try {
+                    this.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }

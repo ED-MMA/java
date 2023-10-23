@@ -1,14 +1,17 @@
 package com.github.aklakina.edmma.events;
 
-import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Mission;
-import com.github.aklakina.edmma.logicalUnit.DataFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 public class MissionAbandoned extends Event {
+
+    private static final Logger logger = LogManager.getLogger(MissionAbandoned.class);
+
     /*
     {
       "event": "MissionAbandoned",
@@ -19,12 +22,13 @@ public class MissionAbandoned extends Event {
     private final long missionId;
 
     public MissionAbandoned(JSONObject json) {
+        logger.info("MissionAbandoned event received");
         missionId = json.getLong("MissionID");
     }
 
     @Override
     public void run() {
-
+        logger.info("MissionAbandoned event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
         Mission mission;
         try {
@@ -33,7 +37,7 @@ public class MissionAbandoned extends Event {
                 entityManager.remove(mission);
             }
         } catch (NoResultException e) {
-            System.err.println("Mission not found: " + missionId);
+            logger.error("Mission not found: " + missionId);
         }
         entityManager.close();
     }

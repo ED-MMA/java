@@ -4,6 +4,8 @@ import com.github.aklakina.edmma.base.ClassLoader;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.json.JSONObject;
 
@@ -14,6 +16,8 @@ import java.lang.reflect.Constructor;
 public abstract class Event implements Runnable {
 
     protected final SessionFactory sessionFactory = ORMConfig.sessionFactory;
+
+    public Logger logger;
 
     public static ClassLoader eventLoader = new ClassLoader() {
         @Override
@@ -26,24 +30,24 @@ public abstract class Event implements Runnable {
                     Constructor<? extends Event> constr = parsed.getDeclaredConstructor(JSONObject.class);
                     if (SingletonFactory.getSingleton(DataFactory.class).registerEventFactory(clazz.getSimpleName(), constr)) {
                         registered.add(parsed);
-                        System.out.println("Class " + clazz.getSimpleName() + " is successfully parsed.");
+                        logger.debug("Class " + clazz.getSimpleName() + " is successfully parsed.");
                     } else {
                         if (registered.contains(clazz))
-                            System.out.println("Class " + clazz.getSimpleName() + " is already registered!");
+                            logger.debug("Class " + clazz.getSimpleName() + " is already registered!");
                         else {
-                            System.out.println("Class " + clazz.getSimpleName() + " could not be registered!");
+                            logger.warn("Class " + clazz.getSimpleName() + " could not be registered!");
                             notRegistered.add(clazz);
                         }
 
                     }
                 } catch (NoSuchMethodException e) {
                     notRegistered.add(clazz);
-                    System.out.println("Class " + clazz.getSimpleName() + " does not have a constructor that takes a JSONObject");
-                    e.printStackTrace();
+                    logger.error("Class " + clazz.getSimpleName() + " does not have a constructor that takes a JSONObject");
+                    //e.printStackTrace();
                 }
 
             } else {
-                System.out.println("Class " + clazz.getSimpleName() + " is not an Event!");
+                logger.error("Class " + clazz.getSimpleName() + " is not an Event!");
                 notRegistered.add(clazz);
             }
         }
@@ -62,6 +66,7 @@ public abstract class Event implements Runnable {
         try {
             eventLoader.loadClassesFromPackage("com.github.aklakina.edmma.events");
         } catch (IOException | ClassNotFoundException e) {
+            //logger.error("Error loading events\n Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
