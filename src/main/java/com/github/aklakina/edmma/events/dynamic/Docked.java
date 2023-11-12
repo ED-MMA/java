@@ -1,4 +1,4 @@
-package com.github.aklakina.edmma.events;
+package com.github.aklakina.edmma.events.dynamic;
 
 
 import com.github.aklakina.edmma.base.Globals;
@@ -6,11 +6,11 @@ import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import com.github.aklakina.edmma.database.orms.Station;
 import com.github.aklakina.edmma.database.orms.System;
+import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.annotations.FlushModeType;
 import org.json.JSONObject;
 
 public class Docked extends Event {
