@@ -1,8 +1,9 @@
-package com.github.aklakina.edmma.events;
+package com.github.aklakina.edmma.events.dynamic;
 
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.FileData;
+import com.github.aklakina.edmma.events.Event;
 import com.github.aklakina.edmma.machineInterface.FileReader;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;

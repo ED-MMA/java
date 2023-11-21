@@ -48,6 +48,11 @@ public class MissionSource {
         return missions;
     }
 
+    @Transient
+    public Set<Mission> getNotCompletedMissions() {
+        return missions.stream().filter(m -> !m.isCompleted()).collect(java.util.stream.Collectors.toSet());
+    }
+
     public void setMissions(Set<Mission> missions) {
         this.missions = missions;
     }

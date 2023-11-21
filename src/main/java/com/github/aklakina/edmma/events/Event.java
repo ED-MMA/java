@@ -54,7 +54,7 @@ public abstract class Event implements Runnable {
 
         @Override
         public boolean fileFilter(File dir, String name) {
-            if (name.endsWith(".class") && !name.endsWith("_.class") && !name.equals("Event.class")) {
+            if (name.endsWith(".class") && !name.endsWith("_.class")) {
                 return true;
             }
             return false;
@@ -64,11 +64,13 @@ public abstract class Event implements Runnable {
 
     static {
         try {
-            eventLoader.loadClassesFromPackage("com.github.aklakina.edmma.events");
+            eventLoader.loadClassesFromPackage("com.github.aklakina.edmma.events.dynamic");
         } catch (IOException | ClassNotFoundException e) {
             //logger.error("Error loading events\n Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+
 
 }

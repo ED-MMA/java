@@ -32,5 +32,6 @@ public class AppCloser {
         }
         SingletonFactory.getSingleton(FileReader.class).close();
         ORMConfig.sessionFactory.close();
+        SingletonFactory.getSingleton(StatisticsCollector.class).Shutdown();
     }
 }

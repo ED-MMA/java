@@ -1,0 +1,180 @@
+\documentclass{scrreprt}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{underscore}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{enumitem}
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage{biblatex}
+\usepackage{color}
+\usepackage{comment}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\setlist[enumerate]{label=\arabic*.}
+\setlist[enumerate,2]{label*=.\arabic*}
+
+\hypersetup{
+    bookmarks=false,    % show bookmarks bar?
+    pdftitle={Software Requirement Specification},    % title
+    pdfauthor={Papp Levente László JANEQB},                     % author
+    pdfsubject={Software specification for EDMMA},                        % subject of the document
+    pdfkeywords={EDMMA, SPEC, SOFTWARE}, % list of keywords
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,       % color of internal links
+    citecolor=black,       % color of links to bibliography
+    filecolor=black,        % color of file links
+    urlcolor=purple,        % color of external links
+    linktoc=page            % only page is linked
+}%
+\def\myversion{1.0 }
+\date{}
+%\title{%
+
+%}
+\begin{document}
+
+    \begin{flushright}
+        \rule{16cm}{5pt}\vskip1cm
+        \begin{bfseries}
+            \Huge{SOFTWARE\\ Specifikáció}\\
+            \vspace{1.5cm}
+            a\\
+            \vspace{1.5cm}
+            Programozás alapjai 3.\\
+            \vspace{1.5cm}
+            tárgyhoz\\
+            \vspace{1.5cm}
+            \LARGE{Verzió \myversion}\\
+            \vspace{1.5cm}
+            Készítette : Papp Levente (JANEQB) (176584@bme.hu)\\
+
+            \vspace{1.5cm}
+            \today\\
+        \end{bfseries}
+    \end{flushright}
+
+    \tableofcontents
+
+
+
+    \chapter{Bevezetés}\label{ch:bevezetes}
+
+    Az \href{https://www.elitedangerous.com/}{Elite: Dangerous\texttrademark} játékban a végtelen univerzum végtelen lehetőséget biztosít.
+    Lehetsz hauler, trader, outlaw vagy éppen zsoldos is.
+    Ez a program a zsoldosnak állt embereket hivatott segíteni.
+
+    \section{A zsoldosokról}\label{sec:a-zsoldosokrol}
+    A zsoldos létnek egy kulcsfontosságú eleme a megfelelő csillag cluster kiválasztása.
+    Vannak, úgynevezett kalóz frakciók, melyek egy adott csillagrendszerben ha dominánsak, akkor a körülötte lévő rendszerekben a nem-kalóz frakciók zsoldosokat keresnek a kiírtásukra.
+    Vagy legalábbis a megcsonkításukra.
+
+    \section{Alap küldetés mechanika}\label{sec:alap-kuldetes-mechanika}
+    A játékban egy adott játékos egyszerre maximum 20 küldetést vihet magával.
+    A küldetések teljesítése soros módon történik, időrend beli sorrendben.
+    Azonban a játék lehetőséget ad ezeknek a küldetéseknek a párhuzamos teljesítésére.
+
+    \subsection{Küldetés mechanika példa}\label{subsec:kuldetes-mechanika-pelda}
+    A legegyszerűbb eset:
+    \begin{enumerate}[label=\thechapter.\arabic*.]
+        \item Van 1 frakció A, aki a játékosnak 3 küldetést adott, összesen 80 kalózt kellene kiiktatni.
+        \item A játékos elmegy a cél csillagrendszerbe és kiírt 80 kalózt.
+        \item A játékos visszatér a frakcióhoz és leadja a küldetéseket.
+    \end{enumerate}
+    A párhuzamos teljesítés esete:
+    \begin{enumerate}[label=\thechapter.\arabic*.]
+        \item Van 3 frakció A, B, C, akik a játékosnak 3 küldetést adtak, összesen 60 kalózt kellene kiiktatni.
+        \item A játékos elmegy a cél csillagrendszerbe és kiírt 20 kalózt.
+        Mivel a játékos 3 különböző frakciótól vette fel a küldetéseket, ezért a játék lehetőséget ad arra, hogy a küldetések párhuzamosan teljesüljenek.
+        \item A játékos visszatér a frakciókhoz és leadja a küldetéseket.
+    \end{enumerate}
+
+    \chapter{Rendszeren belüli axiómák}\label{ch:rendszeren-beluli-axiomak}
+    \begin{enumerate}[label=\thechapter.\arabic*.]
+        \item Minden log file jsonl formátumú
+        \item Minden json object megfeleltethető az event-nek amit a játékos végzett
+        \item Az eventek időrendi sorrendben íródnak a log file-ba
+        \item Minden log file az alábbi könyvtárban található:
+        \subitem \textbf{Windows:} \\
+        userhome\textbackslash Saved Games\textbackslash Frontier Developments\textbackslash Elite Dangerous
+        \subitem \textbf{Linux:}  \\
+        userhome/.steam/steam/SteamApps/compatdata/359320/pfx/drive\_c/users/steamuser\\
+        /Saved Games/Frontier Developments/Elite Dangerous
+        \item A további információk a log file-okról az alábbi linken találhatóak: \\\url{https://elite-journal.readthedocs.io/en/latest/File\%20Format/#file-location}
+    \end{enumerate}
+
+    \chapter{A program részei}\label{ch:a-program-reszei}
+    \begin{enumerate}[label=\thechapter.\arabic*.]
+        \item A program 2 részből áll:
+        \subitem \textbf{1.} A log file-ok feldolgozásából, melyeket a játék generál.
+        \subitem \textbf{2.} A feldolgozott adatok alapján egy statisztika generálásából.
+        \item A program a feldolgozott adatokat egy adatbázisban tárolja.
+        \item A program a feldolgozott adatokat egy grafikus felületen jeleníti meg.
+    \end{enumerate}
+
+\begin{comment}
+
+    \chapter{Szoftver UML diagramm}
+    \section{class diagram}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=0.2]{class_diagram.png}
+        \caption{class diagram}
+        \label{fig:class}
+    \end{figure}
+    \newpage
+    \section{sequence diagram}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[scale=0.2]{sequence_diagram.png}
+        \caption{sequence diagram}
+        \label{fig:seq}
+    \end{figure}
+
+    \chapter{Fontosabb algoritmusok}
+
+    \section{shop}
+    \begin{itemize}
+        \item A $start$ függvény indítja el a szimulációt.
+        \item A $parseData$ függvény az $IO$ class-el való kommunikálást oldja, meg és betölti a szimulációba az adatokat.
+    \end{itemize}
+    \section{System}
+    A class feladata, hogy egy wrapper-ként működjön a $cashier$ class-eket tekintve
+    \begin{itemize}
+        \item Az $insertCashier$ függvény beilleszt egy $cashier$ class-t a tárolóba
+        \item Az $insertCustomer$ függvény beilleszt egy $baseCustomer$ class-t a megfelelő cashier-be.
+        \item A $next$ függvény lépteti a szimulációt, visszaad egy olyan vektort, mely azokat a $baseCustomer$ object-eket tartalmazza, akik legközelebb végezni fognak.
+    \end{itemize}
+    \section{IO}
+    Feladata a memória kezelés, adat beolvasás és kiírás.
+    \begin{itemize}
+        \item A $readCustomers$ függvény beolvassa std::istream-ről az adatokat és a megfelelő származtatott customer class-t példányosítja, majd eltárolja a belső heterogén tárolójában.
+        \item A $readCashiers$ függvény beolvassa std::istream-ről az adatokat és példányosítja a $cashier$ class-t és eltárolja őket a belső tárolójában.
+    \end{itemize}
+    \section{cashier}
+    A class feladata, hogy egy wrapper-ként szolgáljon a sorban álló $baseCustomer$ object-eknek és a megvalósítsa a sorban való helycserék dinamikáját.
+    Az $constructor$ paraméterként megkapja a maximum elemek számát, így ne használjunk std::vector::push\_back-et a cashier implementálásánál.
+    \begin{itemize}
+        \item Az $insert$ függvény a helycsere dinamikákat figyelembevéve beilleszti a $baseCustomer$ object-et a heterogén tárolójába.
+        \item A $remove$ függvény kiveszi a sorból a kapott iterátor által jelölt $baseCustomer$ object-et és a sor maradékát shift-eli.
+    \end{itemize}
+    \section{baseCustomer}
+    A class feladata definiálni a más azonos class-ú object-ek között fellépő összehasonlítási dinamikákat.
+    A class használja a $cashierInterface$ class-t annak érdekében, hogy egy adott object-ről eldönthető legyen, hogy melyik $cashier$ wrapper object része.
+    \begin{itemize}
+        \item A $registered$ változó annak megfelelően van definiálva, hogy mi volt a $customerFactory::registerCustomer$ függvénynek a visszatérési értéke. Így a factory-ba bekerül a customer típus és a $customerFactory::createCustomer$ függvénye meg tudja hívni a megfelelő konstruktort.
+        \item A $getTimeToFinish$ azt adja vissza, hogy ha az adott object lenne az első a kasszánál, akkor mennyi idő lenne, mire végezne.
+        \item A $getPosInLineAndTimeToFinish$ függvény azt adja vissza, hogy az adott $cashier$ object-ben jelenleg hányadik pozícióban van és mennyi idő, mire a jelenlegi állás alapján kijut a sorból. Ha nincs $cashier$ object-ben, akkor a visszatérési érték legyen {-1,-1} (Kihasználva az unsigned long a =-1 overlflow-t)
+        \item A $timeForward$ függvény a bemeneti paraméter mértékével növeli a $current\_product\_num$-ot és lekezeli, ha az adott object $current\_product\_num$-ja egyenlő az $all_product_num$-al, azaz végzett a termékeivel.
+        \item A $letIn$, $goAfter$ és $getInLine$ a sorban állás és helycsere dinamikáit valósítják meg, ebben a class-ben dobjanak kivételt virtual function call-ra ($VirtualFunctionCalled$). Az ebből származtatott class-ekben kell definiálni a működéseit ezeknek a függvényeknek.
+        \item A $getComparePriority$ egy helper függvény, amely virtual és visszaadja az adott class static $comparePriority$ adattagját.
+    \end{itemize}
+
+\end{comment}
+
+\end{document}

@@ -4,9 +4,22 @@ import com.github.aklakina.edmma.database.orms.*;
 import com.github.aklakina.edmma.database.orms.System;
 import org.hibernate.annotations.processing.HQL;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface Queries {
+    @HQL("SELECT c " +
+            "FROM Cluster c " +
+            "WHERE c IN (SELECT clusters FROM System s WHERE s.name = :systemName) " +
+            "ORDER BY SIZE(c.missions) DESC "+
+            "FETCH FIRST 1 ROW ONLY")
+    Cluster getClusterBySystemName(String systemName);
+    @HQL("SELECT c " +
+            "FROM Cluster c " +
+            "WHERE c IN (SELECT clusters FROM System s WHERE s.name = :systemName) " +
+            "AND c.targetFaction.name = :targetFactionName " +
+            "ORDER BY SIZE(c.missions) DESC")
+    Cluster getClusterBySystemNameAnTargetName(String systemName, String targetFactionName);
     @HQL("from FileData where name = :name")
     FileData getFileDataByName(String name);
     @HQL("from GalacticPosition where ID = :id")
@@ -27,4 +40,8 @@ public interface Queries {
             "WHERE cluster.targetFaction.name = :targetFactionName AND progress < killsRequired " +
             "ORDER BY ID ASC")
     List<Mission> getMissionByTargetFaction(String targetFactionName);
+    @HQL("FROM Mission " +
+            "WHERE source.faction.name = :sourceFactionName AND progress < killsRequired " +
+            "ORDER BY ID ASC")
+    List<Mission> getMissionBySourceFaction(String sourceFactionName);
 }

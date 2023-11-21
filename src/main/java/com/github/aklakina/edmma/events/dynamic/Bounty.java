@@ -1,8 +1,9 @@
-package com.github.aklakina.edmma.events;
+package com.github.aklakina.edmma.events.dynamic;
 
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Faction;
 import com.github.aklakina.edmma.database.orms.Mission;
+import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,9 @@ public class Bounty extends Event {
                 }
                 mission.setProgress(mission.getProgress() + 1);
                 entityManager.merge(mission);
+                if (mission.isCompleted()) {
+                    logger.info("Mission " + mission.getID() + " completed");
+                }
             }
         }
         entityManager.getTransaction().commit();
