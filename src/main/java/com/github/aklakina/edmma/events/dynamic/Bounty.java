@@ -32,6 +32,9 @@ public class Bounty extends Event {
                 }
                 mission.setProgress(mission.getProgress() + 1);
                 entityManager.merge(mission);
+                if (mission.isCompleted()) {
+                    logger.info("Mission " + mission.getID() + " completed");
+                }
             }
         }
         entityManager.getTransaction().commit();

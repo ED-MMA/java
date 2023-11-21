@@ -5,7 +5,9 @@ import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.database.Queries_;
+import com.github.aklakina.edmma.database.orms.Cluster;
 import com.github.aklakina.edmma.database.orms.GalacticPosition;
+import com.github.aklakina.edmma.humanInterface.main_window;
 import com.github.aklakina.edmma.machineInterface.WatchDir;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -13,7 +15,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +32,7 @@ public class Init {
 
     Thread fileWatcherThread;
     Thread eventHandlerThread;
-    public Init() {
+    public Init() throws IOException, FontFormatException {
     }
 
     public void start() {

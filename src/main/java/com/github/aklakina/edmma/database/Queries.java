@@ -14,6 +14,12 @@ public interface Queries {
             "ORDER BY SIZE(c.missions) DESC "+
             "FETCH FIRST 1 ROW ONLY")
     Cluster getClusterBySystemName(String systemName);
+    @HQL("SELECT c " +
+            "FROM Cluster c " +
+            "WHERE c IN (SELECT clusters FROM System s WHERE s.name = :systemName) " +
+            "AND c.targetFaction.name = :targetFactionName " +
+            "ORDER BY SIZE(c.missions) DESC")
+    Cluster getClusterBySystemNameAnTargetName(String systemName, String targetFactionName);
     @HQL("from FileData where name = :name")
     FileData getFileDataByName(String name);
     @HQL("from GalacticPosition where ID = :id")

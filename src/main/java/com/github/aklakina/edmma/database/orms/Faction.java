@@ -41,13 +41,18 @@ public class Faction {
         this.missionSources = missionSources;
     }
 
-
     public int hashCode() {
         return name.hashCode();
     }
 
     public boolean equals(Object o) {
         return o instanceof Faction && name.equals(((Faction) o).name);
+    }
+
+    @Transient
+    public int getStackHeight() {
+        return missionSources.stream().mapToInt(ms ->
+                ms.getNotCompletedMissions().stream().mapToInt(Mission::getKillsLeft).sum()).sum();
     }
 
 }

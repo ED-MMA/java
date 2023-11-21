@@ -3,6 +3,9 @@ package com.github.aklakina.edmma.database.orms;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Formula;
 
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+
 @Entity
 @Table(name = "MISSION", schema = "ED")
 public class Mission {
@@ -23,7 +26,6 @@ public class Mission {
     private String acceptTime;
     private boolean completed;
     private int killsLeft;
-
 
     @Id
     public Long getID() {

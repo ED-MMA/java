@@ -40,6 +40,27 @@ public class Cluster {
         return missions;
     }
 
+    @Transient
+    public Set<Mission> getNotCompletedMissions() {
+        return missions.stream().filter(m -> !m.isCompleted()).collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Transient
+    public Set<Mission> getCompletedMissions() {
+        return missions.stream().filter(Mission::isCompleted).collect(java.util.stream.Collectors.toSet());
+    }
+
+    @Transient
+    public int getStackHeight() {
+        return missionSources.stream().mapToInt(ms ->
+                ms.getFaction().getStackHeight()).max().orElse(0);
+    }
+
+    @Transient
+    public int getStackWidth() {
+        return missionSources.stream().map(MissionSource::getFaction).collect(java.util.stream.Collectors.toSet()).size();
+    }
+
     public void setMissions(Set<Mission> missions) {
         this.missions = missions;
     }
