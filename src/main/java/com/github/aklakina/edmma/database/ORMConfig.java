@@ -1,6 +1,7 @@
 package com.github.aklakina.edmma.database;
 
 import com.github.aklakina.edmma.base.ClassLoader;
+import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import org.hibernate.SessionFactory;
@@ -45,7 +46,7 @@ public class ORMConfig {
             builder.addAnnotatedClass(clazz);
         }
         sessionFactory = builder
-                .setProperty("hibernate.connection.url", "jdbc:h2:./EDMMA")
+                .setProperty("hibernate.connection.url", Globals.DATABASE_URL)
                 .setProperty("hibernate.connection.driver_class", "org.h2.Driver")
                 .setProperty(AvailableSettings.CONNECTION_PROVIDER, "org.hibernate.hikaricp.internal.HikariCPConnectionProvider")
                 .setProperty("hibernate.hbm2ddl.auto", "update")

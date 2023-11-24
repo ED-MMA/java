@@ -33,6 +33,9 @@ package com.github.aklakina.edmma.machineInterface;
 
 import com.github.aklakina.edmma.base.*;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
+import com.github.aklakina.edmma.logicalUnit.threading.CloserMethods;
+import com.github.aklakina.edmma.logicalUnit.threading.RegisteredThread;
+import com.github.aklakina.edmma.logicalUnit.threading.ResourceReleasingRunnable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -49,9 +52,8 @@ import static java.nio.file.StandardWatchEventKinds.*;
  */
 
 @Singleton
-public class WatchDir implements Runnable {
+public class WatchDir extends ResourceReleasingRunnable {
     private static final Logger logger = LogManager.getLogger(WatchDir.class);
-    public boolean shouldExit = false;
     private final WatchService watcher;
     private final Map<WatchKey, Path> keys;
     private boolean trace = false;
@@ -70,6 +72,16 @@ public class WatchDir implements Runnable {
         this.trace = true;
     }
 
+    @Override
+    public void releaseResources() {
+        try {
+            watcher.close();
+        } catch (IOException e) {
+            logger.error("Error closing watcher");
+            logger.error("Error: " + e.getMessage());
+        }
+    }
+
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
         return (WatchEvent<T>) event;
@@ -79,7 +91,7 @@ public class WatchDir implements Runnable {
      * Register the given directory with the WatchService
      */
     private void register(Path dir) throws IOException {
-        WatchKey key = dir.register(watcher, ENTRY_MODIFY, ENTRY_CREATE);
+        WatchKey key = dir.register(watcher, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE);
         if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
@@ -97,7 +109,7 @@ public class WatchDir implements Runnable {
      * Process all events for keys queued to the watcher
      */
     public void run() {
-        while (!shouldExit) {
+        while (RegisteredThread.currentThread().shouldContinue()) {
 
             // wait for key to be signalled
             WatchKey key;
@@ -116,7 +128,7 @@ public class WatchDir implements Runnable {
             for (WatchEvent<?> event : key.pollEvents()) {
                 WatchEvent.Kind<?> kind = event.kind();
 
-                // TBD - provide example of how OVERFLOW event is handled
+
                 if (kind == OVERFLOW) {
                     continue;
                 }
@@ -128,13 +140,19 @@ public class WatchDir implements Runnable {
 
                 // print out event
                 logger.debug(event.kind().name() + ": " + child);
-
-                SingletonFactory.getSingleton(DataFactory.class).spawnEvent(
-                        new JSONObject()
-                                .put("event", "FileChanged")
-                                .put("path", child.toString())
-                );
-
+                if (event.kind() == ENTRY_DELETE) {
+                    SingletonFactory.getSingleton(DataFactory.class).spawnEvent(
+                            new JSONObject()
+                                    .put("event", "FileDeleted")
+                                    .put("path", child.toString())
+                    );
+                } else {
+                    SingletonFactory.getSingleton(DataFactory.class).spawnEvent(
+                            new JSONObject()
+                                    .put("event", "FileChanged")
+                                    .put("path", child.toString())
+                    );
+                }
             }
 
             // reset key and remove from set if directory no longer accessible

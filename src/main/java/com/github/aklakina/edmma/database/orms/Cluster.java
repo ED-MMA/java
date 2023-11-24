@@ -18,6 +18,7 @@ public class Cluster {
     private Set<Mission> missions;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getID() {
         return id;
     }

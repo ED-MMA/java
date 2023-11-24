@@ -17,8 +17,6 @@ public abstract class Event implements Runnable {
 
     protected final SessionFactory sessionFactory = ORMConfig.sessionFactory;
 
-    public Logger logger;
-
     public static ClassLoader eventLoader = new ClassLoader() {
         @Override
         public void parse(Class<?> clazz) {

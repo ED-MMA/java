@@ -1,5 +1,6 @@
 package com.github.aklakina.edmma.humanInterface;
 
+import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.orms.System;
@@ -9,7 +10,6 @@ import com.github.aklakina.edmma.logicalUnit.Init;
 import com.github.aklakina.edmma.logicalUnit.StatisticsCollector;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -19,6 +19,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 
@@ -48,15 +49,40 @@ public class main_window {
     private DefaultLabel maxKills;
     private DefaultLabel theorReward;
 
+
     public main_window() {
         tree1.setCellRenderer(new TreeRenderer());
     }
 
     public static void main(String[] args) {
+        if (!Paths.get(Globals.ELITE_LOG_HOME).toFile().exists()) {
+            JOptionPane.showMessageDialog(null, "The directory " + Globals.ELITE_LOG_HOME + " does not exist. Please make sure that the directory exists and contains the Elite Dangerous log files. If the directory does not exists only unit tests can run on the computer.");
+            java.lang.System.exit(0);
+        }
         SingletonFactory.getSingleton(Init.class).start();
         JFrame frame = new JFrame("EDMMA");
         main_window main = SingletonFactory.getSingleton(main_window.class);
         frame.setContentPane(main.panel1);
+
+        // Create a JMenuBar
+        JMenuBar menuBar = new JMenuBar();
+
+        // Create a JMenu
+        JMenu menu = new JMenu("File");
+
+        // Create a JMenuItem with an action to close the application
+        JMenuItem closeItem = new JMenuItem("Close");
+        closeItem.addActionListener(e -> java.lang.System.exit(0));
+
+        // Add the JMenuItem to the JMenu
+        menu.add(closeItem);
+
+        // Add the JMenu to the JMenuBar
+        menuBar.add(menu);
+
+        // Add the JMenuBar to the JFrame
+        frame.setJMenuBar(menuBar);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);

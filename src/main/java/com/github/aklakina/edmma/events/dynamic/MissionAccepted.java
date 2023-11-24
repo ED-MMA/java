@@ -33,7 +33,7 @@ public class MissionAccepted extends Event {
      *  , "Reward":2428060
      *  , "MissionID":726287843 }
      */
-
+    boolean massacre;
     Long missionID;
     String sourceFaction;
     String sourceStation;
@@ -55,11 +55,16 @@ public class MissionAccepted extends Event {
         winged = json.getBoolean("Wing");
         reward = json.getDouble("Reward")/1000000.0;
         killsRequired = json.getInt("KillCount");
+        massacre = json.getString("Name").contains("Massacre");
     }
 
     @Override
     public void run() {
         logger.info("MissionAccepted event started processing");
+        if (!massacre) {
+            logger.debug("Not a massacre mission. Ignoring.");
+            return;
+        }
         EntityManager entityManager = this.sessionFactory.createEntityManager();
         Mission mission;
         Faction targetFaction;

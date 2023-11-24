@@ -38,6 +38,7 @@ public class Bounty extends Event {
             }
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
     /*
     {

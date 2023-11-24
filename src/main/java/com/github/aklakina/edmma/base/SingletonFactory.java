@@ -22,4 +22,5 @@ public class SingletonFactory {
 
         return clazz.cast(singletons.get(clazz));
     }
+
 }

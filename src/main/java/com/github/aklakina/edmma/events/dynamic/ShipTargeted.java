@@ -29,6 +29,7 @@ public class ShipTargeted extends Event {
             return;
         }
         logger.debug("Target faction found. Ready to fire.");
+        entityManager.close();
     }
     /*
     {

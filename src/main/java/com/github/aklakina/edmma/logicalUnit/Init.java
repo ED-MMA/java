@@ -8,6 +8,9 @@ import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Cluster;
 import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import com.github.aklakina.edmma.humanInterface.main_window;
+import com.github.aklakina.edmma.logicalUnit.threading.CloserMethods;
+import com.github.aklakina.edmma.logicalUnit.threading.RegisteredThread;
+import com.github.aklakina.edmma.logicalUnit.threading.Threads;
 import com.github.aklakina.edmma.machineInterface.WatchDir;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -30,9 +33,7 @@ public class Init {
     private static final Logger logger = LogManager.getLogger(Init.class);
     public boolean initState = true;
 
-    Thread fileWatcherThread;
-    Thread eventHandlerThread;
-    public Init() throws IOException, FontFormatException {
+    public Init() {
     }
 
     public void start() {
@@ -55,18 +56,22 @@ public class Init {
         }
         entityManager.close();
 
-        eventHandlerThread = new Thread(SingletonFactory.getSingleton(EventHandler.class));
-        eventHandlerThread.start();
+        RegisteredThread thread = new RegisteredThread(SingletonFactory.getSingleton(EventHandler.class), CloserMethods.INTERRUPT);
+        thread.setName("EventHandler");
+        thread.start();
 
         processChanges();
 
         initState = false;
 
         // run the watchDir in a background thread
-        fileWatcherThread = new Thread(SingletonFactory.getSingleton(WatchDir.class));
-        fileWatcherThread.start();
+        thread = new RegisteredThread(SingletonFactory.getSingleton(WatchDir.class), CloserMethods.INTERRUPT);
+        thread.setName("WatchDir");
+        thread.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> SingletonFactory.getSingleton(AppCloser.class)));
+        SingletonFactory.getSingleton(StatisticsCollector.class);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> SingletonFactory.getSingleton(AppCloser.class).close()));
     }
 
     private void processChanges() {
@@ -88,7 +93,7 @@ public class Init {
                 try {
                     this.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.trace(e.getStackTrace());
                 }
             }
         }

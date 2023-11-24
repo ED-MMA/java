@@ -59,7 +59,12 @@ public class FileData {
         this.file = new File(Paths.get(Globals.ELITE_LOG_HOME, name).toString());
     }
 
-    public File toNative() {
+    @Transient
+    public void loadFile() {
+        this.file = new File(Paths.get(Globals.ELITE_LOG_HOME, name).toString());
+    }
+    @Transient
+    public File getFile() {
         return file;
     }
 

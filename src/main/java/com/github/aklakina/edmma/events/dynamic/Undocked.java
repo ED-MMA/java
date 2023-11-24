@@ -24,6 +24,7 @@ public class Undocked extends Event {
         entityManager.getTransaction().begin();
         entityManager.merge(pos);
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
     /*{ "timestamp":"2021-03-14T18:59:39Z"
      *  , "event":"Undocked"

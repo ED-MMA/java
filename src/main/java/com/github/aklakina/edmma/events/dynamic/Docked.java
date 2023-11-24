@@ -82,8 +82,8 @@ public class Docked extends Event {
             entityManager.getTransaction().commit();
             entityManager.close();
         } catch (Exception e) {
-            java.lang.System.out.println("Error during transaction closing: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error during transaction closing: ", e);
+            logger.trace(e.getStackTrace());
         }
     }
 
