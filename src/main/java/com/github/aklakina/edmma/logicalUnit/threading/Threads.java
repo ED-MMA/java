@@ -5,20 +5,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 @Singleton
 public class Threads {
 
     private static final Logger logger = LogManager.getLogger(Threads.class);
+    private final ArrayList<RegisteredThread> threads = new ArrayList<>();
 
     public Threads() {
 
     }
-
-    private final ArrayList<RegisteredThread> threads = new ArrayList<>();
 
     public void registerThread(RegisteredThread thread) {
         logger.debug("Registering thread " + thread.getName());

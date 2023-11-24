@@ -2,8 +2,8 @@ package com.github.aklakina.edmma.events.dynamic;
 
 import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.database.Queries_;
-import com.github.aklakina.edmma.database.orms.*;
 import com.github.aklakina.edmma.database.orms.System;
+import com.github.aklakina.edmma.database.orms.*;
 import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -53,7 +53,7 @@ public class MissionAccepted extends Event {
         sourceStation = json.getString("DestinationStation");
         expiry = json.getString("Expiry");
         winged = json.getBoolean("Wing");
-        reward = json.getDouble("Reward")/1000000.0;
+        reward = json.getDouble("Reward") / 1000000.0;
         killsRequired = json.getInt("KillCount");
         massacre = json.getString("Name").contains("Massacre");
     }
@@ -89,7 +89,7 @@ public class MissionAccepted extends Event {
         } catch (NoResultException e) {
             logger.debug("Mission " + missionID + " not found in db. Creating new.");
         }
-        
+
         try {
             targetFaction = Queries_.getFactionByName(entityManager, this.targetFaction);
             logger.debug("Faction " + this.targetFaction + " found in db.");
@@ -98,7 +98,7 @@ public class MissionAccepted extends Event {
             targetFaction = new Faction();
             targetFaction.setName(this.targetFaction);
         }
-        
+
         try {
             sourceFaction = Queries_.getFactionByName(entityManager, this.sourceFaction);
             logger.debug("Faction " + this.sourceFaction + " found in db.");
@@ -107,7 +107,7 @@ public class MissionAccepted extends Event {
             sourceFaction = new Faction();
             sourceFaction.setName(this.sourceFaction);
         }
-        
+
         try {
             sourceStation = Queries_.getStationByName(entityManager, this.sourceStation);
             logger.debug("Station " + this.sourceStation + " found in db.");
@@ -117,7 +117,7 @@ public class MissionAccepted extends Event {
             sourceStation.setSystem(pos.getSystem());
             sourceStation.setName(this.sourceStation);
         }
-        
+
         try {
             targetSystem = Queries_.getSystemByName(entityManager, this.targetSystem);
             logger.debug("System " + this.targetSystem + " found in db.");
@@ -126,7 +126,7 @@ public class MissionAccepted extends Event {
             targetSystem = new System();
             targetSystem.setName(this.targetSystem);
         }
-        
+
         try {
             cluster = Queries_.getCluster(entityManager, this.targetFaction, this.targetSystem);
             logger.debug("Cluster " + this.targetFaction + " - " + this.targetSystem + " found in db.");
@@ -136,7 +136,7 @@ public class MissionAccepted extends Event {
             cluster.setTargetFaction(targetFaction);
             cluster.setTargetSystem(targetSystem);
         }
-        
+
         try {
             missionSource = Queries_.getMissionSource(entityManager, this.sourceFaction, this.sourceStation, cluster.getID());
             logger.debug("MissionSource " + this.sourceFaction + " - " + this.sourceStation + " - " + cluster.getID() + " found in db.");

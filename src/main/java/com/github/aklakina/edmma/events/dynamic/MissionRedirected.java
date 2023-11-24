@@ -12,6 +12,22 @@ import org.json.JSONObject;
 public class MissionRedirected extends Event {
 
     private static final Logger logger = LogManager.getLogger(MissionRedirected.class);
+    Long missionID;
+
+    /*{ "timestamp":"2021-03-14T18:10:43Z"
+     *  , "event":"MissionRedirected"
+     *  , "MissionID":726287843
+     *  , "Name":"Mission_MassacreWing"
+     *  , "NewDestinationStation":"Tesla Terminal"
+     *  , "NewDestinationSystem":"Njulngan"
+     *  , "OldDestinationStation":""
+     *  , "OldDestinationSystem":"Qi Yomisii" }
+     */
+
+    public MissionRedirected(JSONObject json) {
+        logger.info("MissionRedirected event received");
+        missionID = json.getLong("MissionID");
+    }
 
     @Override
     public void run() {
@@ -32,22 +48,5 @@ public class MissionRedirected extends Event {
         entityManager.merge(mission);
         entityManager.getTransaction().commit();
         entityManager.close();
-    }
-
-    /*{ "timestamp":"2021-03-14T18:10:43Z"
-     *  , "event":"MissionRedirected"
-     *  , "MissionID":726287843
-     *  , "Name":"Mission_MassacreWing"
-     *  , "NewDestinationStation":"Tesla Terminal"
-     *  , "NewDestinationSystem":"Njulngan"
-     *  , "OldDestinationStation":""
-     *  , "OldDestinationSystem":"Qi Yomisii" }
-     */
-
-    Long missionID;
-
-    public MissionRedirected(JSONObject json) {
-        logger.info("MissionRedirected event received");
-        missionID = json.getLong("MissionID");
     }
 }

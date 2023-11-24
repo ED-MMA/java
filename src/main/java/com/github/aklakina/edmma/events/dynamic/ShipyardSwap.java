@@ -9,10 +9,6 @@ public class ShipyardSwap extends Event {
 
     private static final Logger logger = LogManager.getLogger(ShipyardSwap.class);
 
-    @Override
-    public void run() {
-
-    }
     /*{ "timestamp":"2022-04-24T12:02:04Z"
      * , "event":"ShipyardSwap"
      * , "ShipType":"krait_mkii"
@@ -24,5 +20,10 @@ public class ShipyardSwap extends Event {
      */
     public ShipyardSwap(JSONObject json) {
         // TODO: find out something that actually worth implementing
+    }
+
+    @Override
+    public void run() {
+
     }
 }

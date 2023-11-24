@@ -1,23 +1,13 @@
 import com.github.aklakina.edmma.base.Globals;
-import com.github.aklakina.edmma.base.SingletonFactory;
-import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.database.Queries_;
-import com.github.aklakina.edmma.database.orms.*;
-import com.github.aklakina.edmma.logicalUnit.AppCloser;
-import com.github.aklakina.edmma.logicalUnit.DataFactory;
-import com.github.aklakina.edmma.logicalUnit.EventHandler;
-import com.github.aklakina.edmma.logicalUnit.Init;
-import jakarta.persistence.EntityManager;
+import com.github.aklakina.edmma.database.orms.Mission;
 import jakarta.persistence.NoResultException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EventTests extends TestFramework {
@@ -25,6 +15,11 @@ public class EventTests extends TestFramework {
     @BeforeAll
     public static void init() {
         TestFramework.init();
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        TestFramework.tearDown();
     }
 
     @Test
@@ -109,10 +104,5 @@ public class EventTests extends TestFramework {
 
         assertThrows(NoResultException.class, () -> Queries_.getMissionByID(entityManager, 1L));
 
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        TestFramework.tearDown();
     }
 }

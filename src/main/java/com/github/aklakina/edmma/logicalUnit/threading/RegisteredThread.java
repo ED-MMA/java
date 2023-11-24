@@ -7,15 +7,8 @@ import org.apache.logging.log4j.Logger;
 public class RegisteredThread extends Thread {
 
     private static final Logger logger = LogManager.getLogger(RegisteredThread.class);
-
-    private boolean shouldExit = false;
-
     CloserMethods closerMethod = CloserMethods.NOTIFY;
-
-    public void setCloserMethod(CloserMethods closerMethod) {
-        this.closerMethod = closerMethod;
-    }
-
+    private boolean shouldExit = false;
     private ResourceReleasingRunnable runnable;
 
     public RegisteredThread(Runnable runnable) {
@@ -42,6 +35,14 @@ public class RegisteredThread extends Thread {
         SingletonFactory.getSingleton(Threads.class).registerThread(this);
     }
 
+    public static RegisteredThread currentThread() {
+        return (RegisteredThread) Thread.currentThread();
+    }
+
+    public void setCloserMethod(CloserMethods closerMethod) {
+        this.closerMethod = closerMethod;
+    }
+
     public boolean shouldContinue() {
         return !shouldExit;
     }
@@ -59,10 +60,6 @@ public class RegisteredThread extends Thread {
             runnable.releaseResources();
         logger.debug("Thread " + this.getName() + " finished");
         SingletonFactory.getSingleton(Threads.class).removeThread(this);
-    }
-
-    public static RegisteredThread currentThread() {
-        return (RegisteredThread) Thread.currentThread();
     }
 
     public RegisteredThread setNamed(String name) {

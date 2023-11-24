@@ -8,13 +8,12 @@ import java.util.Set;
 @Table(name = "SYSTEM", schema = "ED")
 public class System {
 
-    public System() {
-    }
     private Set<Station> stations;
     private String name;
     private Set<Cluster> clusters;
     private GalacticPosition galacticPosition;
-
+    public System() {
+    }
 
     @OneToMany(mappedBy = Station_.SYSTEM)
     public Set<Station> getStations() {

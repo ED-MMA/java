@@ -31,9 +31,10 @@ package com.github.aklakina.edmma.machineInterface;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.github.aklakina.edmma.base.*;
+import com.github.aklakina.edmma.base.Globals;
+import com.github.aklakina.edmma.base.Singleton;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
-import com.github.aklakina.edmma.logicalUnit.threading.CloserMethods;
 import com.github.aklakina.edmma.logicalUnit.threading.RegisteredThread;
 import com.github.aklakina.edmma.logicalUnit.threading.ResourceReleasingRunnable;
 import org.apache.logging.log4j.LogManager;
@@ -72,6 +73,11 @@ public class WatchDir extends ResourceReleasingRunnable {
         this.trace = true;
     }
 
+    @SuppressWarnings("unchecked")
+    static <T> WatchEvent<T> cast(WatchEvent<?> event) {
+        return (WatchEvent<T>) event;
+    }
+
     @Override
     public void releaseResources() {
         try {
@@ -80,11 +86,6 @@ public class WatchDir extends ResourceReleasingRunnable {
             logger.error("Error closing watcher");
             logger.error("Error: " + e.getMessage());
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    static <T> WatchEvent<T> cast(WatchEvent<?> event) {
-        return (WatchEvent<T>) event;
     }
 
     /**

@@ -2,17 +2,12 @@ import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.FileData;
-import com.github.aklakina.edmma.events.dynamic.FileChanged;
-import com.github.aklakina.edmma.logicalUnit.threading.Threads;
 import com.github.aklakina.edmma.machineInterface.FileReader;
-import com.github.aklakina.edmma.machineInterface.WatchDir;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MachineInterfaceTests extends TestFramework {
@@ -54,6 +48,11 @@ public class MachineInterfaceTests extends TestFramework {
         Globals.FILE_READER_CHECK_INTERVAL_UNIT = TimeUnit.SECONDS;
         Globals.FILE_READER_CHECK_INTERVAL = 4;
         TestFramework.init();
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        TestFramework.tearDown();
     }
 
     @Test
@@ -168,11 +167,6 @@ public class MachineInterfaceTests extends TestFramework {
         assertEquals(file1.getFileName().toString(), fileData.getName());
         assertEquals(3, fileData.getLastLineRead());
         assertEquals(file1.toFile().length(), fileData.getLastSize());
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        TestFramework.tearDown();
     }
 
 }

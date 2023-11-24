@@ -4,8 +4,6 @@ import com.github.aklakina.edmma.base.ClassLoader;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.json.JSONObject;
 
@@ -14,8 +12,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 public abstract class Event implements Runnable {
-
-    protected final SessionFactory sessionFactory = ORMConfig.sessionFactory;
 
     public static ClassLoader eventLoader = new ClassLoader() {
         @Override
@@ -52,10 +48,7 @@ public abstract class Event implements Runnable {
 
         @Override
         public boolean fileFilter(File dir, String name) {
-            if (name.endsWith(".class") && !name.endsWith("_.class")) {
-                return true;
-            }
-            return false;
+            return name.endsWith(".class") && !name.endsWith("_.class");
         }
 
     };
@@ -69,6 +62,7 @@ public abstract class Event implements Runnable {
         }
     }
 
+    protected final SessionFactory sessionFactory = ORMConfig.sessionFactory;
 
 
 }

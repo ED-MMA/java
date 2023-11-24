@@ -7,10 +7,8 @@ import com.github.aklakina.edmma.database.orms.Mission;
 import com.github.aklakina.edmma.humanInterface.main_window;
 import com.github.aklakina.edmma.logicalUnit.threading.CloserMethods;
 import com.github.aklakina.edmma.logicalUnit.threading.RegisteredThread;
-import org.glassfish.jaxb.runtime.v2.runtime.unmarshaller.XsiNilLoader;
 
 import java.util.HashMap;
-import java.util.List;
 
 @Singleton
 public class StatisticsCollector {
@@ -22,6 +20,8 @@ public class StatisticsCollector {
 
      */
 
+    private Cluster cluster;
+
     public StatisticsCollector() {
         new RegisteredThread(this::collectMissionStatistics, CloserMethods.INTERRUPT).setNamed("MissionStatisticsThread").start();
         new RegisteredThread(this::collectGalaxyStatistics, CloserMethods.INTERRUPT).setNamed("GalaxyStatisticsThread").start();
@@ -29,7 +29,9 @@ public class StatisticsCollector {
         new RegisteredThread(this::collectTheoreticalStatistics, CloserMethods.INTERRUPT).setNamed("TheoreticalStatisticsThread").start();
     }
 
-    private Cluster cluster;
+    public Cluster getCluster() {
+        return cluster;
+    }
 
     public void setCluster(Cluster cluster) {
         this.cluster = cluster;
@@ -50,10 +52,6 @@ public class StatisticsCollector {
         }
         SingletonFactory.getSingleton(main_window.class).resetSlider();
         SingletonFactory.getSingleton(main_window.class).setCluster(cluster.getTargetSystem().getName());
-    }
-
-    public Cluster getCluster() {
-        return cluster;
     }
 
     private void collectMissionStatistics() {
@@ -139,7 +137,7 @@ public class StatisticsCollector {
         }
     }
 
-    public static enum StatisticsFlag {
+    public enum StatisticsFlag {
         MISSIONS,
         GALAXY,
         COMPLETED,

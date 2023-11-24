@@ -2,10 +2,10 @@ package com.github.aklakina.edmma.machineInterface;
 
 import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.base.Singleton;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.FileData;
-import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
 import com.github.aklakina.edmma.logicalUnit.Init;
 import com.github.aklakina.edmma.logicalUnit.threading.CloserMethods;
@@ -24,23 +24,110 @@ import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class FileReader {
     private static final Logger logger = LogManager.getLogger(FileReader.class);
-
+    private final HashMap<FileData, RegisteredThread> readers;
+    private final SessionFactory sessionFactory;
     private boolean shouldClose = false;
+
+    public FileReader() {
+        this.sessionFactory = ORMConfig.sessionFactory;
+        readers = new HashMap<>();
+    }
+
+    public synchronized void processEvent(FileData file) {
+        if (!readers.containsKey(file)) {
+            logger.debug("New file detected: " + file.getName());
+            ReadingData readingData = new ReadingData(file);
+            RegisteredThread thread = new RegisteredThread(readingData, CloserMethods.NOTIFY);
+            thread.setNamed("FileReader-" + file.getName()).start();
+            readers.put(file, thread);
+            logger.debug("New reader started on " + file.getName());
+        }
+        synchronized (readers.get(file)) {
+            readers.get(file).notify();
+            logger.debug("Notified reader on " + file.getName());
+        }
+    }
+
+    public void waitForThreadOnFile(File f) {
+        EntityManager entityManager = sessionFactory.createEntityManager();
+        FileData file = Queries_.getFileDataByName(entityManager, f.getName());
+        entityManager.close();
+        if (file == null) {
+            logger.debug("File not found: " + f.getName());
+            return;
+        }
+        RegisteredThread thread = readers.get(file);
+        if (thread == null) {
+            logger.debug("File reader not found: " + f.getName());
+            return;
+        }
+        synchronized (thread) {
+            try {
+                thread.wait();
+            } catch (InterruptedException e) {
+                logger.error("Error waiting for thread: " + thread.getName());
+                logger.error("Error: " + e.getMessage());
+                logger.trace(e.getStackTrace());
+            }
+        }
+    }
+
+    public void close() {
+        SingletonFactory.getSingleton(FileReader.class).shouldClose = true;
+        for (FileData file : readers.keySet()) {
+            readers.get(file).exit();
+            readers.remove(file);
+        }
+    }
+
+    public void removeFile(FileData file) {
+        RegisteredThread thread = readers.get(file);
+        if (thread == null) {
+            logger.debug("File reader not found: " + file.getName());
+            return;
+        }
+        thread.exit();
+            /* Maybe we do not need to wait for it to close since if we remove it from the map it will be garbage collected
+            if (Thread.currentThread() != thread) {
+                logger.debug("Joining thread: " + file.getName());
+                thread.join();
+            }
+            */
+        readers.remove(file);
+    }
 
     private static class ReadingData extends ResourceReleasingRunnable {
         private static final Logger logger = LogManager.getLogger(ReadingData.class);
         private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        private final FileData file;
         public BufferedReader reader;
         public Integer currentLine;
-        private final FileData file;
         private boolean firstRun = true;
         private boolean fileAccessed = true;
-        private ScheduledFuture<?> scheduledFuture;
+        private final ScheduledFuture<?> scheduledFuture;
+
+        public ReadingData(FileData file) {
+            this.file = file;
+            this.currentLine = 0;
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file.getFile());
+                reader = new BufferedReader(new InputStreamReader(fileInputStream));
+                while (currentLine < file.getLastLineRead()) {
+                    reader.readLine();
+                    currentLine++;
+                }
+            } catch (Exception e) {
+                logger.error("Error reading file");
+                logger.error("Error: " + e.getMessage());
+                logger.trace(e.getStackTrace());
+            }
+            scheduledFuture = scheduler.scheduleAtFixedRate(this::checkAndRelease, 0, Globals.FILE_READER_CHECK_INTERVAL, Globals.FILE_READER_CHECK_INTERVAL_UNIT);
+        }
+
         public synchronized void changed() {
             fileAccessed = true;
             try {
@@ -60,24 +147,6 @@ public class FileReader {
                 logger.trace(e.getStackTrace());
             }
 
-        }
-
-        public ReadingData(FileData file) {
-            this.file = file;
-            this.currentLine = 0;
-            try {
-                FileInputStream fileInputStream = new FileInputStream(file.getFile());
-                reader = new BufferedReader(new InputStreamReader(fileInputStream));
-                while (currentLine < file.getLastLineRead()) {
-                    reader.readLine();
-                    currentLine++;
-                }
-            } catch (Exception e) {
-                logger.error("Error reading file");
-                logger.error("Error: " + e.getMessage());
-                logger.trace(e.getStackTrace());
-            }
-            scheduledFuture = scheduler.scheduleAtFixedRate(this::checkAndRelease, 0, Globals.FILE_READER_CHECK_INTERVAL, Globals.FILE_READER_CHECK_INTERVAL_UNIT);
         }
 
         private void checkAndRelease() {
@@ -151,78 +220,6 @@ public class FileReader {
                 }
             }
         }
-    }
-
-    private final HashMap<FileData, RegisteredThread> readers;
-
-    public synchronized void processEvent(FileData file) {
-        if (!readers.containsKey(file)) {
-            logger.debug("New file detected: " + file.getName());
-            ReadingData readingData = new ReadingData(file);
-            RegisteredThread thread = new RegisteredThread(readingData, CloserMethods.NOTIFY);
-            thread.setNamed("FileReader-" + file.getName()).start();
-            readers.put(file, thread);
-            logger.debug("New reader started on " + file.getName());
-        }
-        synchronized (readers.get(file)) {
-            readers.get(file).notify();
-            logger.debug("Notified reader on " + file.getName());
-        }
-    }
-
-    public void waitForThreadOnFile(File f) {
-        EntityManager entityManager = sessionFactory.createEntityManager();
-        FileData file = Queries_.getFileDataByName(entityManager, f.getName());
-        entityManager.close();
-        if (file == null) {
-            logger.debug("File not found: " + f.getName());
-            return;
-        }
-        RegisteredThread thread = readers.get(file);
-        if (thread == null) {
-            logger.debug("File reader not found: " + f.getName());
-            return;
-        }
-        synchronized (thread) {
-            try {
-                thread.wait();
-            } catch (InterruptedException e) {
-                logger.error("Error waiting for thread: " + thread.getName());
-                logger.error("Error: " + e.getMessage());
-                logger.trace(e.getStackTrace());
-            }
-        }
-    }
-
-    private final SessionFactory sessionFactory;
-
-    public FileReader() {
-        this.sessionFactory = ORMConfig.sessionFactory;
-        readers = new HashMap<>();
-    }
-
-    public void close() {
-        SingletonFactory.getSingleton(FileReader.class).shouldClose = true;
-        for (FileData file : readers.keySet()) {
-            readers.get(file).exit();
-            readers.remove(file);
-        }
-    }
-
-    public void removeFile(FileData file) {
-        RegisteredThread thread = readers.get(file);
-        if (thread == null) {
-            logger.debug("File reader not found: " + file.getName());
-            return;
-        }
-        thread.exit();
-            /* Maybe we do not need to wait for it to close since if we remove it from the map it will be garbage collected
-            if (Thread.currentThread() != thread) {
-                logger.debug("Joining thread: " + file.getName());
-                thread.join();
-            }
-            */
-        readers.remove(file);
     }
 
 }

@@ -12,7 +12,8 @@ public abstract class ResourceReleasingRunnable implements Runnable {
     protected ResourceReleasingRunnable() {
     }
 
-    public void releaseResources() {}
+    public void releaseResources() {
+    }
 
     protected void waitForThreadNotify() throws InterruptedException {
         synchronized (this) {
@@ -34,5 +35,6 @@ public abstract class ResourceReleasingRunnable implements Runnable {
         }
     }
 
-    public void actionOnThreadNotify() {}
+    public void actionOnThreadNotify() {
+    }
 }

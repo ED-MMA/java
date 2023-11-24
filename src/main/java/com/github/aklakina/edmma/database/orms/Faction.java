@@ -7,19 +7,19 @@ import java.util.Set;
 @Entity
 @Table(name = "FACTION", schema = "ED")
 public class Faction {
-    public Faction() {
-
-    }
     private String name;
     private Set<MissionSource> missionSources;
     private Set<Cluster> clusters;
+    public Faction() {
+
+    }
 
     @Id
     public String getName() {
         return name;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 

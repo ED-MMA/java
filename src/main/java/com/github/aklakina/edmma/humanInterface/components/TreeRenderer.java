@@ -13,8 +13,8 @@ public class TreeRenderer implements TreeCellRenderer {
                                                   boolean selected, boolean expanded, boolean leaf,
                                                   int row, boolean hasFocus) {
 
-            label.setText(value.toString());
+        label.setText(value.toString());
 
-            return label;
+        return label;
     }
 }

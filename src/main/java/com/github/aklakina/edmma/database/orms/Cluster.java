@@ -7,15 +7,14 @@ import java.util.Set;
 @Entity
 @Table(name = "CLUSTER", schema = "ED")
 public class Cluster {
-    public Cluster() {
-    }
     private Faction targetFaction;
     private Set<MissionSource> missionSources;
     private System targetSystem;
-
     private Long id;
-
     private Set<Mission> missions;
+
+    public Cluster() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +40,10 @@ public class Cluster {
         return missions;
     }
 
+    public void setMissions(Set<Mission> missions) {
+        this.missions = missions;
+    }
+
     @Transient
     public Set<Mission> getNotCompletedMissions() {
         return missions.stream().filter(m -> !m.isCompleted()).collect(java.util.stream.Collectors.toSet());
@@ -60,10 +63,6 @@ public class Cluster {
     @Transient
     public int getStackWidth() {
         return missionSources.stream().map(MissionSource::getFaction).collect(java.util.stream.Collectors.toSet()).size();
-    }
-
-    public void setMissions(Set<Mission> missions) {
-        this.missions = missions;
     }
 
     public int hashCode() {

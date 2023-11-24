@@ -2,15 +2,11 @@ package com.github.aklakina.edmma.database;
 
 import com.github.aklakina.edmma.base.ClassLoader;
 import com.github.aklakina.edmma.base.Globals;
-import com.github.aklakina.edmma.base.Singleton;
-import com.github.aklakina.edmma.base.SingletonFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ORMConfig {
     public static SessionFactory sessionFactory;
@@ -24,12 +20,10 @@ public class ORMConfig {
                 notRegistered.add(clazz);
             }
         }
+
         @Override
         public boolean fileFilter(java.io.File dir, String name) {
-            if (name.endsWith(".class") && !name.endsWith("_.class")) {
-                return true;
-            }
-            return false;
+            return name.endsWith(".class") && !name.endsWith("_.class");
         }
     };
 

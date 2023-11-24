@@ -2,24 +2,17 @@ package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.events.Event;
-import com.github.aklakina.edmma.logicalUnit.threading.CloserMethods;
-import com.github.aklakina.edmma.logicalUnit.threading.RegisteredThread;
 import com.github.aklakina.edmma.logicalUnit.threading.ResourceReleasingRunnable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Singleton
 public class EventHandler extends ResourceReleasingRunnable {
     private static final Logger logger = LogManager.getLogger(EventHandler.class);
-
-    public boolean shouldExit = false;
-
     private final LinkedBlockingQueue<Event> eventsToProcess = new LinkedBlockingQueue<>();
+    public boolean shouldExit = false;
 
     public void waitForEvents() throws InterruptedException {
         synchronized (this) {

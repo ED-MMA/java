@@ -7,11 +7,10 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Constructor;
 import java.util.TreeMap;
-import java.util.function.Function;
 
 @Singleton
 public class DataFactory {
-    private static TreeMap<String, Constructor<? extends Event>> eventFactories = new TreeMap<>();
+    private static final TreeMap<String, Constructor<? extends Event>> eventFactories = new TreeMap<>();
 
     public boolean registerEventFactory(String eventType, Constructor<? extends Event> eventFactory) {
         if (eventFactories.containsKey(eventType)) {

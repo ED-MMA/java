@@ -17,8 +17,8 @@ public class MissionCompleted extends Event {
     private final Long missionID;
 
     public MissionCompleted(JSONObject json) {
-        this.massacre=json.getString("Name").contains("Massacre");
-        this.missionID=json.getLong("MissionID");
+        this.massacre = json.getString("Name").contains("Massacre");
+        this.missionID = json.getLong("MissionID");
     }
 
     @Override

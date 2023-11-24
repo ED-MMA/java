@@ -8,14 +8,12 @@ import java.util.Set;
 @Table(name = "STATION", schema = "ED")
 public class Station {
 
-    public Station() {
-    }
-
     private System system;
-
     private String name;
     private GalacticPosition galacticPosition;
     private Set<MissionSource> missionSources;
+    public Station() {
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     public System getSystem() {

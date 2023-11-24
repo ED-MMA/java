@@ -6,6 +6,8 @@ import java.awt.*;
 
 public class AggregationColumnRenderer implements TableCellRenderer {
 
+    private final DefaultLabel label = new DefaultLabel();
+
     public int calculateValue(JTable table, int row) {
         int sum = 0;
         for (int i = 1; i < table.getColumnCount() - 1; i++) {
@@ -15,8 +17,6 @@ public class AggregationColumnRenderer implements TableCellRenderer {
         }
         return sum;
     }
-
-    private final DefaultLabel label = new DefaultLabel();
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value,

@@ -13,6 +13,7 @@ public class TitleLabel extends JLabel {
         //set color to orange
         setForeground(new Color(255, 165, 0));
     }
+
     public TitleLabel(String text) {
         super(text);
         setFont(Resources.getFancyFont().deriveFont(12f));

@@ -13,6 +13,23 @@ import org.json.JSONObject;
 public class ShipTargeted extends Event {
 
     private static final Logger logger = LogManager.getLogger(ShipTargeted.class);
+    /*
+    {
+      "event":"ShipTargeted",
+      "TargetLocked":true,
+      "ScanStage":3,
+      "Faction":"The Pilots Federation"
+    }
+     */
+    private final String faction;
+
+    public ShipTargeted(JSONObject json) {
+        logger.info("ShipTargeted event received");
+        if (json.has("Faction"))
+            faction = json.getString("Faction");
+        else
+            faction = "";
+    }
 
     @Override
     public void run() {
@@ -30,21 +47,5 @@ public class ShipTargeted extends Event {
         }
         logger.debug("Target faction found. Ready to fire.");
         entityManager.close();
-    }
-    /*
-    {
-      "event":"ShipTargeted",
-      "TargetLocked":true,
-      "ScanStage":3,
-      "Faction":"The Pilots Federation"
-    }
-     */
-    private String faction;
-    public ShipTargeted(JSONObject json) {
-        logger.info("ShipTargeted event received");
-        if (json.has("Faction"))
-            faction = json.getString("Faction");
-        else
-            faction = "";
     }
 }

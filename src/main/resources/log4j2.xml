@@ -7,30 +7,30 @@
         </Console>
         <RollingFile name="app_log" fileName="logs/EDMMA/latest.log" filePattern="logs/EDMMA/log_%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="%d [%t] %-5level %logger{2}.%method:%line - %msg%n"/>
-            <OnStartupTriggeringPolicy />
+            <OnStartupTriggeringPolicy/>
             <DefaultRolloverStrategy max="4"/>
         </RollingFile>
         <RollingFile name="db_log" fileName="logs/DB/latest.log" filePattern="logs/DB/log_%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="%d [%t] %-5level %logger{5}.%method:%line - %msg%n"/>
-            <OnStartupTriggeringPolicy />
+            <OnStartupTriggeringPolicy/>
             <DefaultRolloverStrategy max="4"/>
         </RollingFile>
     </Appenders>
     <Loggers>
         <logger name="org.hibernate">
-            <level value="INFO" />
+            <level value="INFO"/>
             <AppenderRef ref="db_log"/>
         </logger>
         <logger name="com.zaxxer">
-            <level value="INFO" />
+            <level value="INFO"/>
             <AppenderRef ref="db_log"/>
         </logger>
         <logger name="com.github.aklakina">
-            <level value="INFO" />
+            <level value="INFO"/>
             <AppenderRef ref="app_log"/>
         </logger>
         <Root level="ALL">
-            <AppenderRef ref="console" />
+            <AppenderRef ref="console"/>
         </Root>
     </Loggers>
 </Configuration>

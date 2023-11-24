@@ -12,6 +12,16 @@ public class Undocked extends Event {
 
     private static final Logger logger = LogManager.getLogger(Undocked.class);
 
+    public Undocked(JSONObject json) {
+        logger.info("Undocked event received");
+    }
+    /*{ "timestamp":"2021-03-14T18:59:39Z"
+     *  , "event":"Undocked"
+     *  , "StationName":"XNB-55Z"
+     *  , "StationType":"FleetCarrier"
+     *  , "MarketID":3705556992 }
+     */
+
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();
@@ -25,15 +35,5 @@ public class Undocked extends Event {
         entityManager.merge(pos);
         entityManager.getTransaction().commit();
         entityManager.close();
-    }
-    /*{ "timestamp":"2021-03-14T18:59:39Z"
-     *  , "event":"Undocked"
-     *  , "StationName":"XNB-55Z"
-     *  , "StationType":"FleetCarrier"
-     *  , "MarketID":3705556992 }
-     */
-
-    public Undocked(JSONObject json) {
-        logger.info("Undocked event received");
     }
 }

@@ -7,14 +7,13 @@ import java.util.Set;
 @Entity
 @Table(name = "MISSIONSOURCE", schema = "ED")
 public class MissionSource {
-    public MissionSource() {
-    }
-
     private Long id;
     private Faction faction;
     private Station station;
     private Set<Mission> missions;
     private Cluster cluster;
+    public MissionSource() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,13 +48,13 @@ public class MissionSource {
         return missions;
     }
 
+    public void setMissions(Set<Mission> missions) {
+        this.missions = missions;
+    }
+
     @Transient
     public Set<Mission> getNotCompletedMissions() {
         return missions.stream().filter(m -> !m.isCompleted()).collect(java.util.stream.Collectors.toSet());
-    }
-
-    public void setMissions(Set<Mission> missions) {
-        this.missions = missions;
     }
 
     public int hashCode() {

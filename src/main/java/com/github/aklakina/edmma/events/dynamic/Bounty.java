@@ -16,6 +16,19 @@ import java.util.Set;
 public class Bounty extends Event {
 
     private static final Logger logger = LogManager.getLogger(Bounty.class);
+    private final String VictimFaction;
+    /*
+    {
+      "event":"Bounty",
+      "VictimFaction":"The Pilots Federation",
+      "TotalReward":0
+    }
+     */
+
+    public Bounty(JSONObject json) {
+        logger.debug("Bounty event received");
+        VictimFaction = json.getString("VictimFaction");
+    }
 
     @Override
     public void run() {
@@ -39,19 +52,5 @@ public class Bounty extends Event {
         }
         entityManager.getTransaction().commit();
         entityManager.close();
-    }
-    /*
-    {
-      "event":"Bounty",
-      "VictimFaction":"The Pilots Federation",
-      "TotalReward":0
-    }
-     */
-
-    private final String VictimFaction;
-
-    public Bounty(JSONObject json) {
-        logger.debug("Bounty event received");
-        VictimFaction = json.getString("VictimFaction");
     }
 }

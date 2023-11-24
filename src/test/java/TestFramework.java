@@ -21,39 +21,12 @@ import java.util.List;
 
 public class TestFramework {
 
-    private static final Logger logger = LogManager.getLogger(TestFramework.class);
-
     protected static final List<JSONObject> events = new ArrayList<>();
-
-    protected static class TestEvent extends com.github.aklakina.edmma.events.Event {
-
-        private final JSONObject json;
-
-        @Override
-        public void run() {
-            TestFramework.events.add(json);
-        }
-
-        public TestEvent(JSONObject json) {
-            this.json = json;
-        }
-    }
-
+    private static final Logger logger = LogManager.getLogger(TestFramework.class);
     @Mock
     protected JSONObject json;
-
     protected EntityManager entityManager;
-
     protected AutoCloseable mockEntities;
-
-    protected void createAndWaitForEvent() throws InterruptedException {
-        SingletonFactory.getSingleton(DataFactory.class).spawnEvent(json);
-        waitForEvents();
-    }
-
-    protected void waitForEvents() throws InterruptedException {
-        SingletonFactory.getSingleton(EventHandler.class).waitForEvents();
-    }
 
     @BeforeAll
     public static void init() {
@@ -68,6 +41,21 @@ public class TestFramework {
         SingletonFactory.getSingleton(Init.class).start();
     }
 
+    @AfterAll
+    public static void tearDown() {
+
+        SingletonFactory.getSingleton(AppCloser.class);
+    }
+
+    protected void createAndWaitForEvent() throws InterruptedException {
+        SingletonFactory.getSingleton(DataFactory.class).spawnEvent(json);
+        waitForEvents();
+    }
+
+    protected void waitForEvents() throws InterruptedException {
+        SingletonFactory.getSingleton(EventHandler.class).waitForEvents();
+    }
+
     @BeforeEach
     public void setup() {
         mockEntities = MockitoAnnotations.openMocks(this);
@@ -80,9 +68,17 @@ public class TestFramework {
         mockEntities.close();
     }
 
-    @AfterAll
-    public static void tearDown() {
+    protected static class TestEvent extends com.github.aklakina.edmma.events.Event {
 
-        SingletonFactory.getSingleton(AppCloser.class);
+        private final JSONObject json;
+
+        public TestEvent(JSONObject json) {
+            this.json = json;
+        }
+
+        @Override
+        public void run() {
+            TestFramework.events.add(json);
+        }
     }
 }
