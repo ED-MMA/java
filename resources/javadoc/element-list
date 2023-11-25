@@ -1,0 +1,10 @@
+com.github.aklakina.edmma.base
+com.github.aklakina.edmma.database
+com.github.aklakina.edmma.database.orms
+com.github.aklakina.edmma.events
+com.github.aklakina.edmma.events.dynamic
+com.github.aklakina.edmma.humanInterface
+com.github.aklakina.edmma.humanInterface.components
+com.github.aklakina.edmma.logicalUnit
+com.github.aklakina.edmma.logicalUnit.threading
+com.github.aklakina.edmma.machineInterface
