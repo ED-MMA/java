@@ -10,19 +10,36 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * ShipTargeted event:
+ * <pre>
+ * {
+ *   "event":"ShipTargeted",
+ *   "TargetLocked":true,
+ *   "ScanStage":3,
+ *   "Faction":"The Pilots Federation"
+ * }
+ * </pre>
+ * Triggered when the player targets a ship.
+ */
 public class ShipTargeted extends Event {
 
+    /**
+     * The logger object used for logging.
+     */
     private static final Logger logger = LogManager.getLogger(ShipTargeted.class);
-    /*
-    {
-      "event":"ShipTargeted",
-      "TargetLocked":true,
-      "ScanStage":3,
-      "Faction":"The Pilots Federation"
-    }
+
+    /**
+     * The faction of the targeted ship.
      */
     private final String faction;
 
+    /**
+     * Constructor with parameters.
+     * Initializes the faction of the targeted ship.
+     *
+     * @param json the JSON object containing the event data
+     */
     public ShipTargeted(JSONObject json) {
         logger.info("ShipTargeted event received");
         if (json.has("Faction"))
@@ -31,6 +48,11 @@ public class ShipTargeted extends Event {
             faction = "";
     }
 
+    /**
+     * Processes the ShipTargeted event.
+     * It checks if the targeted ship's faction is a target faction.
+     * If it is, it logs that the ship is ready to fire.
+     */
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();

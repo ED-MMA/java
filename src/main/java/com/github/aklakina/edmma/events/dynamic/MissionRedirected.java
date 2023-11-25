@@ -9,26 +9,49 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * MissionRedirected event:
+ * <pre>
+ * {
+ *   "timestamp":"2021-03-14T18:10:43Z",
+ *   "event":"MissionRedirected",
+ *   "MissionID":726287843,
+ *   "Name":"Mission_MassacreWing",
+ *   "NewDestinationStation":"Tesla Terminal",
+ *   "NewDestinationSystem":"Njulngan",
+ *   "OldDestinationStation":"",
+ *   "OldDestinationSystem":"Qi Yomisii"
+ * }
+ * </pre>
+ * Triggered when the player's mission is redirected.
+ */
 public class MissionRedirected extends Event {
 
-    private static final Logger logger = LogManager.getLogger(MissionRedirected.class);
-    Long missionID;
-
-    /*{ "timestamp":"2021-03-14T18:10:43Z"
-     *  , "event":"MissionRedirected"
-     *  , "MissionID":726287843
-     *  , "Name":"Mission_MassacreWing"
-     *  , "NewDestinationStation":"Tesla Terminal"
-     *  , "NewDestinationSystem":"Njulngan"
-     *  , "OldDestinationStation":""
-     *  , "OldDestinationSystem":"Qi Yomisii" }
+    /**
+     * The logger object used for logging.
      */
+    private static final Logger logger = LogManager.getLogger(MissionRedirected.class);
 
+    /**
+     * The ID of the mission that was redirected.
+     */
+    private final Long missionID;
+
+    /**
+     * Constructor with parameters.
+     * Initializes the ID of the mission that was redirected.
+     *
+     * @param json the JSON object containing the event data
+     */
     public MissionRedirected(JSONObject json) {
         logger.info("MissionRedirected event received");
         missionID = json.getLong("MissionID");
     }
 
+    /**
+     * Processes the MissionRedirected event.
+     * It gets the mission by its ID, and if it exists, it updates the mission progress.
+     */
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();

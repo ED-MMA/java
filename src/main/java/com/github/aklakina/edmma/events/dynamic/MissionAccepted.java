@@ -2,8 +2,8 @@ package com.github.aklakina.edmma.events.dynamic;
 
 import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.database.Queries_;
-import com.github.aklakina.edmma.database.orms.System;
 import com.github.aklakina.edmma.database.orms.*;
+import com.github.aklakina.edmma.database.orms.System;
 import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -11,27 +11,39 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * MissionAccepted event:
+ * <pre>
+ * {
+ *   "event":"MissionAccepted",
+ *   "Faction":"People's MET 20 Liberals",
+ *   "Name":"Mission_MassacreWing",
+ *   "LocalisedName":"Massacre Qi Yomisii Council faction Pirates",
+ *   "TargetType":"$MissionUtil_FactionTag_Pirate;",
+ *   "TargetType_Localised":"Pirates",
+ *   "TargetFaction":"Qi Yomisii Council",
+ *   "KillCount":20,
+ *   "DestinationSystem":"Qi Yomisii",
+ *   "DestinationStation":"Seddon Terminal",
+ *   "Expiry":"2021-03-17T14:26:09Z",
+ *   "Wing":true,
+ *   "Influence":"++",
+ *   "Reputation":"++",
+ *   "Reward":2428060,
+ *   "MissionID":726287843
+ * }
+ * </pre>
+ * Triggered when the player accepts a mission.
+ */
 public class MissionAccepted extends Event {
 
+    /**
+     * The logger object used for logging.
+     */
     private static final Logger logger = LogManager.getLogger(MissionAccepted.class);
 
-    /*{ "timestamp":"2021-03-10T14:58:54Z"
-     *  , "event":"MissionAccepted"
-     *  , "Faction":"People's MET 20 Liberals"
-     *  , "Name":"Mission_MassacreWing"
-     *  , "LocalisedName":"Massacre Qi Yomisii Council faction Pirates"
-     *  , "TargetType":"$MissionUtil_FactionTag_Pirate;"
-     *  , "TargetType_Localised":"Pirates"
-     *  , "TargetFaction":"Qi Yomisii Council"
-     *  , "KillCount":20
-     *  , "DestinationSystem":"Qi Yomisii"
-     *  , "DestinationStation":"Seddon Terminal"
-     *  , "Expiry":"2021-03-17T14:26:09Z"
-     *  , "Wing":true
-     *  , "Influence":"++"
-     *  , "Reputation":"++"
-     *  , "Reward":2428060
-     *  , "MissionID":726287843 }
+    /**
+     * The mission details.
      */
     boolean massacre;
     Long missionID;
@@ -44,6 +56,12 @@ public class MissionAccepted extends Event {
     double reward;
     Integer killsRequired;
 
+    /**
+     * Constructor with parameters.
+     * Initializes the mission details.
+     *
+     * @param json the JSON object containing the event data
+     */
     public MissionAccepted(JSONObject json) {
         logger.info("MissionAccepted event received");
         missionID = json.getLong("MissionID");
@@ -58,6 +76,11 @@ public class MissionAccepted extends Event {
         massacre = json.getString("Name").contains("Massacre");
     }
 
+    /**
+     * Processes the MissionAccepted event and updates the mission details.
+     * It gets the mission by its ID, and if it does not exist, it creates it.
+     * Then, it updates the mission details.
+     */
     @Override
     public void run() {
         logger.info("MissionAccepted event started processing");

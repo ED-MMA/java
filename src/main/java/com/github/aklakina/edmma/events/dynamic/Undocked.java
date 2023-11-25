@@ -8,20 +8,40 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * Undocked event:
+ * <pre>
+ * {
+ *   "timestamp":"2021-03-14T18:59:39Z",
+ *   "event":"Undocked",
+ *   "StationName":"XNB-55Z",
+ *   "StationType":"FleetCarrier",
+ *   "MarketID":3705556992
+ * }
+ * </pre>
+ * Triggered when the player undocks from a station.
+ */
 public class Undocked extends Event {
 
+    /**
+     * The logger object used for logging.
+     */
     private static final Logger logger = LogManager.getLogger(Undocked.class);
 
+    /**
+     * Constructor with parameters.
+     * Initializes the event data.
+     *
+     * @param json the JSON object containing the event data
+     */
     public Undocked(JSONObject json) {
         logger.info("Undocked event received");
     }
-    /*{ "timestamp":"2021-03-14T18:59:39Z"
-     *  , "event":"Undocked"
-     *  , "StationName":"XNB-55Z"
-     *  , "StationType":"FleetCarrier"
-     *  , "MarketID":3705556992 }
-     */
 
+    /**
+     * Processes the Undocked event.
+     * It updates the galactic position to indicate that the player is not docked at any station.
+     */
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();

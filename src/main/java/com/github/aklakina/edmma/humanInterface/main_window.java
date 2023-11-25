@@ -23,6 +23,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 
+/**
+ * This class represents the main window of the application.
+ * It contains methods for constructing the tree and table views, displaying statistics, and copying data to the clipboard.
+ * It also contains a main method to start the application.
+ */
 @Singleton
 public class main_window {
     private final HashMap<TreeObject<System>, HashMap<TreeObject<System>,
@@ -49,11 +54,18 @@ public class main_window {
     private DefaultLabel maxKills;
     private DefaultLabel theorReward;
 
-
+    /**
+     * The constructor sets the cell renderer for the tree view.
+     */
     public main_window() {
         tree1.setCellRenderer(new TreeRenderer());
     }
-
+    /**
+     * The main method starts the application.
+     * It checks if the directory containing the Elite Dangerous log files exists, starts the Init singleton, creates a JFrame, sets the content pane to the main window's panel, and makes the frame visible.
+     *
+     * @param args The command line arguments.
+     */
     public static void main(String[] args) {
         if (!Paths.get(Globals.ELITE_LOG_HOME).toFile().exists()) {
             JOptionPane.showMessageDialog(null, "The directory " + Globals.ELITE_LOG_HOME + " does not exist. Please make sure that the directory exists and contains the Elite Dangerous log files. If the directory does not exists only unit tests can run on the computer.");
@@ -88,10 +100,19 @@ public class main_window {
         frame.setVisible(true);
     }
 
+    /**
+     * This method sets the cluster name in the main window.
+     *
+     * @param clusterName The name of the cluster.
+     */
     public void setCluster(String clusterName) {
         this.clusterName.setText(clusterName);
     }
 
+    /**
+     * This method starts the main window.
+     * It adds change listeners to the slider and action listeners to the copy buttons.
+     */
     public void start() {
         this.slider1.addChangeListener(e -> updateTheoreticalValues());
         this.copyCalculatedDataToButton.addActionListener(e -> copyDataToClipboard(getCalculatedData()));
@@ -99,19 +120,35 @@ public class main_window {
         this.copyOnlyCompletedDataButton.addActionListener(e -> copyDataToClipboard(getOnlyCompletedData()));
     }
 
+    /**
+     * This method updates the theoretical values by notifying the THEORETICAL flag of the StatisticsCollector.
+     */
     private void updateTheoreticalValues() {
         StatisticsCollector.StatisticsFlag.THEORETICAL.notify();
     }
 
+    /**
+     * This method returns the value of the slider which represents the theoretical kills.
+     *
+     * @return The value of the slider.
+     */
     public int getTheorKills() {
         return this.slider1.getValue();
     }
 
+    /**
+     * This method resets the slider by setting its value and minimum to 0.
+     */
     public void resetSlider() {
         this.slider1.setValue(0);
         this.slider1.setMinimum(0);
     }
 
+    /**
+     * This method displays the statistics by setting the text of the corresponding labels.
+     *
+     * @param stats A map containing the statistics. The key is the name of the statistic and the value is the value of the statistic.
+     */
     public void displayStatistics(HashMap<String, String> stats) {
         Class<?> clazz = this.getClass();
         for (Map.Entry<String, String> entry : stats.entrySet()) {
@@ -127,12 +164,22 @@ public class main_window {
         }
     }
 
+    /**
+     * This method copies the given data to the clipboard.
+     *
+     * @param data The data to be copied to the clipboard.
+     */
     private void copyDataToClipboard(String data) {
         StringSelection stringSelection = new StringSelection(data);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, null);
     }
 
+    /**
+     * This method returns a string containing the calculated data.
+     *
+     * @return A string containing the calculated data.
+     */
     private String getCalculatedData() {
         return "Cluster name: " + this.clusterName.getText() + "\n" +
                 "Completed missions: " + this.completedCounter.getText() + "\n" +
@@ -149,6 +196,11 @@ public class main_window {
                 "Theoretical reward: " + this.theorReward.getText() + "\n";
     }
 
+    /**
+     * This method returns a string containing the full data.
+     *
+     * @return A string containing the full data.
+     */
     private String getFullData() {
         return "Cluster name: " + this.clusterName.getText() + "\n" +
                 "Completed missions: " + this.completedCounter.getText() + "\n" +
@@ -161,6 +213,11 @@ public class main_window {
                 "Kill efficiency: " + this.killEfficiency.getText() + "\n";
     }
 
+    /**
+     * This method returns a string containing only the completed data.
+     *
+     * @return A string containing only the completed data.
+     */
     private String getOnlyCompletedData() {
         return "Cluster name: " + this.clusterName.getText() + "\n" +
                 "Completed missions: " + this.completedCounter.getText() + "\n" +
@@ -169,6 +226,11 @@ public class main_window {
                 "Payment ratio: " + this.paymentRatio.getText() + "\n";
     }
 
+    /**
+     * This method constructs the tree view for the given cluster.
+     *
+     * @param cluster The cluster for which the tree view is to be constructed.
+     */
     public void constructTree(Cluster cluster) {
         DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(cluster.getTargetSystem().getName());
@@ -211,6 +273,11 @@ public class main_window {
         model.reload();
     }
 
+    /**
+     * This method constructs the table view for the given cluster.
+     *
+     * @param cluster The cluster for which the table view is to be constructed.
+     */
     public void constructTable(Cluster cluster) {
         // Clear the table
         table1.setModel(new DefaultTableModel());
@@ -264,19 +331,42 @@ public class main_window {
         table1.setRowSorter(sorter);
     }
 
+    /**
+     * This class represents an object in the tree view.
+     * It contains the object and its corresponding tree node.
+     *
+     * @param <T> The type of the object.
+     */
     private static class TreeObject<T> {
         T object;
         DefaultMutableTreeNode node;
 
+        /**
+         * The constructor sets the object and its corresponding tree node.
+         *
+         * @param object The object.
+         * @param node The tree node.
+         */
         public TreeObject(T object, DefaultMutableTreeNode node) {
             this.object = object;
             this.node = node;
         }
 
+        /**
+         * The constructor sets the object.
+         *
+         * @param object The object.
+         */
         public TreeObject(T object) {
             this.object = object;
         }
 
+        /**
+         * This method checks if this object is equal to the given object.
+         *
+         * @param o The object to be compared with this object.
+         * @return true if the objects are equal, false otherwise.
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -285,6 +375,11 @@ public class main_window {
             return Objects.equals(object, that.object);
         }
 
+        /**
+         * This method returns a hash code value for the object.
+         *
+         * @return A hash code value for the object.
+         */
         @Override
         public int hashCode() {
             return Objects.hash(object);

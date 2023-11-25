@@ -21,15 +21,28 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Singleton class responsible for initializing the application.
+ * It starts the event handler, processes changes, and starts the WatchDir.
+ */
 @Singleton
 public class Init {
 
+    // Logger instance for this class
     private static final Logger logger = LogManager.getLogger(Init.class);
+    // State of initialization
     public boolean initState = true;
 
+    /**
+     * Default constructor.
+     */
     public Init() {
     }
 
+    /**
+     * Starts the initialization process.
+     * It sets up the galactic position, starts the event handler and WatchDir, and processes changes.
+     */
     public void start() {
         logger.info("Init class started");
         EntityManager entityManager = ORMConfig.sessionFactory.createEntityManager();
@@ -68,6 +81,10 @@ public class Init {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> SingletonFactory.getSingleton(AppCloser.class).close()));
     }
 
+    /**
+     * Processes changes in the log files.
+     * It spawns a FileChanged event for each log file.
+     */
     private void processChanges() {
         File[] files = Paths.get(Globals.ELITE_LOG_HOME).toFile().listFiles((dir, name) -> name.matches(Globals.LOG_FILE_NAME_REGEX.pattern()));
         if (files == null) {

@@ -13,17 +13,41 @@ import org.json.JSONObject;
 
 import java.nio.file.Path;
 
+/**
+ * FileChanged event:
+ * <pre>
+ *     {
+ *         "event": "FileChanged"
+ *         "path": "path/to/file"
+ *     }
+ * </pre>
+ * Triggered when a file changes.
+ */
 public class FileChanged extends Event {
 
     private static final Logger logger = LogManager.getLogger(FileChanged.class);
 
+    /**
+     * The path of the file that changed.
+     */
     private final Path path;
 
+    /**
+     * Constructor with parameters.
+     * Initializes the path of the file that changed.
+     *
+     * @param event the JSON object containing the event data
+     */
     public FileChanged(JSONObject event) {
         logger.info("FileChanged event received");
         this.path = Path.of(event.getString("path"));
     }
 
+    /**
+     * Processes the FileChanged event.
+     * It gets the file data by its name, and if it does not exist, it creates it.
+     * Then, it loads the file and processes the event.
+     */
     @Override
     public void run() {
         logger.info("FileChanged event started processing");

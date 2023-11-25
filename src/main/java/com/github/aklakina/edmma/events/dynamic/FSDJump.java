@@ -11,42 +11,66 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * FSDJump event:
+ * <pre>
+ * {
+ *   "timestamp":"2022-04-21T20:05:12Z",
+ *   "event":"FSDJump",
+ *   "StarSystem":"Pegasi Sector XU-O b6-4",
+ *   "SystemAddress":9465168209329,
+ *   "StarPos":[-129.56250,-75.81250,15.78125],
+ *   "SystemAllegiance":"",
+ *   "SystemEconomy":"$economy_None;",
+ *   "SystemEconomy_Localised":"None",
+ *   "SystemSecondEconomy":"$economy_None;",
+ *   "SystemSecondEconomy_Localised":"None",
+ *   "SystemGovernment":"$government_None;",
+ *   "SystemGovernment_Localised":"None",
+ *   "SystemSecurity":"$GAlAXY_MAP_INFO_state_anarchy;",
+ *   "SystemSecurity_Localised":"Anarchy",
+ *   "Population":0,
+ *   "Body":"Pegasi Sector XU-O b6-4",
+ *   "BodyID":0,
+ *   "BodyType":"Star",
+ *   "JumpDist":19.757,
+ *   "FuelUsed":6.710013,
+ *   "FuelLevel":25.289986
+ * }
+ * </pre>
+ * Triggered when the player makes a jump to another star system.
+ */
 public class FSDJump extends Event {
 
+    /**
+     * The logger object used for logging.
+     */
     private static final Logger logger = LogManager.getLogger(FSDJump.class);
 
-    /* { "timestamp":"2022-04-21T20:05:12Z"
-     * , "event":"FSDJump"
-     * , "StarSystem":"Pegasi Sector XU-O b6-4"
-     * , "SystemAddress":9465168209329
-     * , "StarPos":[-129.56250,-75.81250,15.78125]
-     * , "SystemAllegiance":""
-     * , "SystemEconomy":"$economy_None;"
-     * , "SystemEconomy_Localised":"None"
-     * , "SystemSecondEconomy":"$economy_None;"
-     * , "SystemSecondEconomy_Localised":"None"
-     * , "SystemGovernment":"$government_None;"
-     * , "SystemGovernment_Localised":"None"
-     * , "SystemSecurity":"$GAlAXY_MAP_INFO_state_anarchy;"
-     * , "SystemSecurity_Localised":"Anarchy"
-     * , "Population":0
-     * , "Body":"Pegasi Sector XU-O b6-4"
-     * , "BodyID":0
-     * , "BodyType":"Star"
-     * , "JumpDist":19.757
-     * , "FuelUsed":6.710013
-     * , "FuelLevel":25.289986 }
+    /**
+     * The name of the star system where the player jumped to.
      */
-
     private final String StarSystem;
 
+    /**
+     * Constructor with parameters.
+     * Initializes the star system where the player jumped to.
+     *
+     * @param json the JSON object containing the event data
+     */
     public FSDJump(JSONObject json) {
         logger.info("FSDJump event received");
         StarSystem = json.getString("StarSystem");
     }
 
+    /**
+     * Processes the FSDJump event and updates the galactic position.
+     * It gets the system by its name, and if it does not exist, it creates it.
+     * Then, it updates the galactic position to the new system.
+     */
     @Override
     public void run() {
+        logger.info("FSDJump event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
         entityManager.getTransaction().begin();
         System sys;
@@ -69,6 +93,5 @@ public class FSDJump extends Event {
 
         entityManager.getTransaction().commit();
         entityManager.close();
-
     }
 }

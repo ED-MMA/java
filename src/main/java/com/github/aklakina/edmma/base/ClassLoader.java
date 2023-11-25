@@ -10,12 +10,27 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Abstract class for loading and parsing classes.
+ */
 public abstract class ClassLoader {
 
+    // Logger for logging information and debug messages
     protected final static Logger logger = LogManager.getLogger(ClassLoader.class);
+
+    // Set of registered classes
     public Set<Class<?>> registered = new HashSet<>();
+
+    // Set of classes that failed to register
     public Set<Class<?>> notRegistered = new HashSet<>();
 
+    /**
+     * Retrieves class files from a given package.
+     *
+     * @param packageName the name of the package to load classes from
+     * @param filter a FilenameFilter to filter the files in the package
+     * @return an array of File objects representing the class files in the package
+     */
     private static File[] getClassFiles(String packageName, FilenameFilter filter) {
         logger.info("Loading classes from package " + packageName);
         java.lang.ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -33,12 +48,31 @@ public abstract class ClassLoader {
 
     }
 
+    /**
+     * Abstract method for parsing a class.
+     *
+     * @param clazz the class to parse
+     */
     public abstract void parse(Class<?> clazz);
 
+    /**
+     * Filters files based on their name.
+     *
+     * @param dir the directory in which the file is located
+     * @param name the name of the file
+     * @return true if the file ends with ".class" and does not end with "_.class", false otherwise
+     */
     public boolean fileFilter(File dir, String name) {
         return name.endsWith(".class") && !name.endsWith("_.class");
     }
 
+    /**
+     * Loads and parses classes from a given package.
+     *
+     * @param packageName the name of the package to load classes from
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if the class cannot be located
+     */
     public void loadClassesFromPackage(String packageName) throws IOException, ClassNotFoundException {
         File[] files = getClassFiles(packageName, ClassLoader.this::fileFilter);
         if (files == null) {

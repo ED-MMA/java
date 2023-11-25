@@ -25,18 +25,36 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
+/**
+ * Singleton class responsible for reading files.
+ * It manages file readers and processes file events.
+ */
 @Singleton
 public class FileReader {
+    // Logger instance for this class
     private static final Logger logger = LogManager.getLogger(FileReader.class);
+    // Map to store file readers
     private final HashMap<FileData, RegisteredThread> readers;
+    // Session factory for database operations
     private final SessionFactory sessionFactory;
+    // Flag to indicate if the file reader should close
     private boolean shouldClose = false;
 
+    /**
+     * Default constructor.
+     * It initializes the readers map and the session factory.
+     */
     public FileReader() {
         this.sessionFactory = ORMConfig.sessionFactory;
         readers = new HashMap<>();
     }
 
+    /**
+     * Processes a file event.
+     * If the file is new, it starts a new reader thread for the file.
+     * If the file is already being read, it notifies the reader thread.
+     * @param file The file to process.
+     */
     public synchronized void processEvent(FileData file) {
         if (!readers.containsKey(file)) {
             logger.debug("New file detected: " + file.getName());
@@ -52,6 +70,10 @@ public class FileReader {
         }
     }
 
+    /**
+     * Waits for the reader thread on a file to finish.
+     * @param f The file to wait for.
+     */
     public void waitForThreadOnFile(File f) {
         EntityManager entityManager = sessionFactory.createEntityManager();
         FileData file = Queries_.getFileDataByName(entityManager, f.getName());
@@ -76,6 +98,10 @@ public class FileReader {
         }
     }
 
+    /**
+     * Closes the file reader.
+     * It sets the shouldClose flag to true and closes all reader threads.
+     */
     public void close() {
         SingletonFactory.getSingleton(FileReader.class).shouldClose = true;
         for (FileData file : readers.keySet()) {
@@ -84,6 +110,10 @@ public class FileReader {
         }
     }
 
+    /**
+     * Removes a file from the readers map and closes its reader thread.
+     * @param file The file to remove.
+     */
     public void removeFile(FileData file) {
         RegisteredThread thread = readers.get(file);
         if (thread == null) {
@@ -110,6 +140,15 @@ public class FileReader {
         private boolean fileAccessed = true;
         private final ScheduledFuture<?> scheduledFuture;
 
+        /**
+         * Default constructor for creating a reading data runnable.
+         * This constructor will initialize the file, currentLine, and reader variables.
+         * It will also schedule the checkAndRelease method.
+         *
+         * @see ReadingData#checkAndRelease()
+         *
+         * @param file The file to be read.
+         */
         public ReadingData(FileData file) {
             this.file = file;
             this.currentLine = 0;
@@ -128,6 +167,14 @@ public class FileReader {
             scheduledFuture = scheduler.scheduleAtFixedRate(this::checkAndRelease, 0, Globals.FILE_READER_CHECK_INTERVAL, Globals.FILE_READER_CHECK_INTERVAL_UNIT);
         }
 
+        /**
+         * Method to read the file.
+         * This method will read the file line by line and spawn events.
+         * This method will also update the currentLine variable.
+         *
+         * @see SingletonFactory#getSingleton(Class)
+         * @see DataFactory#spawnEvent(JSONObject)
+         */
         public synchronized void changed() {
             fileAccessed = true;
             try {
@@ -149,6 +196,11 @@ public class FileReader {
 
         }
 
+        /**
+         * Method to check if the file has been accessed.
+         * If the file has not been accessed, this method will call the exit method and remove the file from the singleton factory.
+         * If the file has been accessed, this method will set the fileAccessed flag to false.
+         */
         private void checkAndRelease() {
             if (!fileAccessed) {
                 logger.debug("File not accessed for " + Globals.FILE_READER_CHECK_INTERVAL + " " + Globals.FILE_READER_CHECK_INTERVAL_UNIT.name() + ". Releasing resources");
@@ -160,6 +212,11 @@ public class FileReader {
             }
         }
 
+        /**
+         * Method to release resources.
+         * This method will close the reader and update the database.
+         * It will also cancel the scheduled future.
+         */
         public void releaseResources() {
             try {
                 reader.close();
@@ -198,6 +255,14 @@ public class FileReader {
 
         }
 
+        /**
+         * Method to perform an action on thread notification.
+         * It will call the changed method and notify the init class if it is initialized.
+         *
+         * @see ReadingData#changed()
+         *
+         * @see Init#processChanges()
+         */
         @Override
         public void actionOnThreadNotify() {
             changed();
@@ -209,6 +274,21 @@ public class FileReader {
             }
         }
 
+        /**
+         * Method to wait for thread notification.
+         * This method will notify all threads and then wait.
+         * This method will also log the file name.
+         * This method will not wait on the first run.
+         *
+         * @see RegisteredThread#currentThread()
+         *
+         * @see RegisteredThread#notifyAll()
+         * @see RegisteredThread#wait()
+         *
+         * @see ReadingData#firstRun
+         *
+         * @throws InterruptedException
+         */
         @Override
         protected void waitForThreadNotify() throws InterruptedException {
             if (firstRun) {

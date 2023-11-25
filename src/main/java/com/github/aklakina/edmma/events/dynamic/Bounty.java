@@ -13,23 +13,45 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * spawner event:
+ * <pre>
+ * {
+ *   "event":"Bounty",
+ *   "VictimFaction":"The Pilots Federation",
+ *   "TotalReward":0
+ * }
+ * </pre>
+ * Triggered when the player kills a wanted ship.
+ */
 public class Bounty extends Event {
 
-    private static final Logger logger = LogManager.getLogger(Bounty.class);
-    private final String VictimFaction;
-    /*
-    {
-      "event":"Bounty",
-      "VictimFaction":"The Pilots Federation",
-      "TotalReward":0
-    }
+    /**
+     * The logger object used for logging.
      */
+    private static final Logger logger = LogManager.getLogger(Bounty.class);
 
+    /**
+     * The victim faction of the bounty event.
+     */
+    private final String VictimFaction;
+
+    /**
+     * Constructor with parameters.
+     * Initializes the victim faction of the bounty event.
+     *
+     * @param json the JSON object containing the event data
+     */
     public Bounty(JSONObject json) {
         logger.debug("Bounty event received");
         VictimFaction = json.getString("VictimFaction");
     }
 
+    /**
+     * Processes the bounty event and updates the progress of missions.
+     * It gets the missions for the victim faction, and for each mission, it increases the progress by 1.
+     * If a mission is completed, it logs the completion of the mission.
+     */
     @Override
     public void run() {
         logger.info("Bounty event started processing");

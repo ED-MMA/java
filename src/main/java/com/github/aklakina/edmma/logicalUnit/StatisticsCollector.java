@@ -33,6 +33,18 @@ public class StatisticsCollector {
         return cluster;
     }
 
+    /**
+     * Method to set the cluster.
+     * This method will notify all threads when it is done setting the cluster.
+     * This method will also notify the main window to reset the slider and set the cluster name.
+     *
+     * @see main_window#resetSlider()
+     * @see main_window#setCluster(String)
+     *
+     * @see Cluster
+     *
+     * @param cluster the cluster to be set
+     */
     public void setCluster(Cluster cluster) {
         this.cluster = cluster;
         synchronized (StatisticsFlag.MISSIONS) {
@@ -54,6 +66,22 @@ public class StatisticsCollector {
         SingletonFactory.getSingleton(main_window.class).setCluster(cluster.getTargetSystem().getName());
     }
 
+    /**
+     * Method to collect mission statistics.
+     * This method will wait for thread notification and then collect mission statistics while the current thread should continue.
+     * This method will notify all threads when it is done collecting mission statistics.
+     * This method will also notify the main window to display the statistics.
+     *
+     * @see main_window#displayStatistics(HashMap)
+     * @see StatisticsFlag#MISSIONS
+     *
+     * @see Cluster
+     * @see Cluster#getMissions()
+     * @see Cluster#getNotCompletedMissions()
+     * @see Mission#getKillsLeft()
+     * @see Mission#getProgress()
+     * @see Mission#getReward()
+     */
     private void collectMissionStatistics() {
         while (RegisteredThread.currentThread().shouldContinue()) {
             try {
@@ -76,6 +104,23 @@ public class StatisticsCollector {
         }
     }
 
+    /**
+     * Method to collect galaxy statistics.
+     * This method will wait for thread notification and then collect galaxy statistics while the current thread should continue.
+     * This method will notify all threads when it is done collecting galaxy statistics.
+     * This method will also notify the main window to display the statistics.
+     *
+     * @see main_window#constructTree(Cluster)
+     * @see main_window#constructTable(Cluster)
+     * @see StatisticsFlag#GALAXY
+     *
+     * @see Cluster
+     * @see Cluster#getCompletedMissions()
+     * @see Cluster#getNotCompletedMissions()
+     * @see Mission#getReward()
+     * @see Mission#getKillsLeft()
+     * @see Mission#getProgress()
+     */
     private void collectGalaxyStatistics() {
         while (RegisteredThread.currentThread().shouldContinue()) {
             try {
@@ -93,6 +138,15 @@ public class StatisticsCollector {
         }
     }
 
+    /**
+     * Method to collect completed statistics.
+     * This method will wait for thread notification and then collect completed statistics while the current thread should continue.
+     * This method will notify all threads when it is done collecting completed statistics.
+     * This method will also notify the main window to display the statistics.
+     *
+     * @see main_window#displayStatistics(HashMap)
+     * @see StatisticsFlag#COMPLETED
+     */
     private void collectCompletedStatistics() {
         while (RegisteredThread.currentThread().shouldContinue()) {
             try {
@@ -114,6 +168,12 @@ public class StatisticsCollector {
         }
     }
 
+
+    /**
+     * Method to collect theoretical statistics.
+     * This method will wait for thread notification and then collect theoretical statistics while the current thread should continue.
+     * This method will notify all threads when it is done collecting theoretical statistics.
+     */
     private void collectTheoreticalStatistics() {
         while (RegisteredThread.currentThread().shouldContinue()) {
             try {
@@ -137,6 +197,10 @@ public class StatisticsCollector {
         }
     }
 
+    /**
+     * Enum representing statistics flags.
+     * These flags are used to notify threads to collect statistics.
+     */
     public enum StatisticsFlag {
         MISSIONS,
         GALAXY,

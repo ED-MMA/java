@@ -11,17 +11,40 @@ import org.json.JSONObject;
 
 import java.nio.file.Path;
 
+/**
+ * FileDeleted event:
+ * <pre>
+ *     {
+ *         "event": "FileDeleted"
+ *         "path": "path/to/file"
+ *      }
+ * </pre>
+ * Triggered when a file is deleted.
+ */
 public class FileDeleted extends Event {
 
     private static final Logger logger = LogManager.getLogger(FileDeleted.class);
 
+    /**
+     * The path of the file that was deleted.
+     */
     private final Path path;
 
+    /**
+     * Constructor with parameters.
+     * Initializes the path of the file that was deleted.
+     *
+     * @param event the JSON object containing the event data
+     */
     public FileDeleted(JSONObject event) {
         logger.info("FileDeleted event received");
         this.path = Path.of(event.getString("path"));
     }
 
+    /**
+     * Processes the FileDeleted event.
+     * It gets the file data by its name, and if it exists, it deletes it.
+     */
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();

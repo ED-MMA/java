@@ -1,6 +1,5 @@
 package com.github.aklakina.edmma.events.dynamic;
 
-
 import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.GalacticPosition;
@@ -13,37 +12,60 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
+/**
+ * Docked event:
+ * <pre>
+ * {
+ *   "timestamp":"2021-03-14T18:56:42Z",
+ *   "event":"Docked",
+ *   "StationName":"XNB-55Z",
+ *   "StationType":"FleetCarrier",
+ *   "StarSystem":"Qi Yomisii",
+ *   "SystemAddress":22953915599624,
+ *   "MarketID":3705556992,
+ *   "StationFaction":{ "Name":"FleetCarrier" },
+ *   "StationGovernment":"$government_Carrier;",
+ *   "StationGovernment_Localised":"Private Ownership ",
+ *   "StationServices":[ "dock", "autodock", "commodities", "contacts", "exploration", "outfitting", "crewlounge", "rearm", "refuel", "repair", "shipyard", "engineer", "flightcontroller", "stationoperations", "stationMenu", "carriermanagement", "carrierfuel", "voucherredemption" ],
+ *   "StationEconomy":"$economy_Carrier;",
+ *   "StationEconomy_Localised":"Private Enterprise",
+ *   "StationEconomies":[ { "Name":"$economy_Carrier;", "Name_Localised":"Private Enterprise", "Proportion":1.000000 } ],
+ *   "DistFromStarLS":610.551176
+ * }
+ * </pre>
+ * Triggered when the player docks at a station.
+ */
 public class Docked extends Event {
 
     private static final Logger logger = LogManager.getLogger(Docked.class);
 
-    /*
-     *{ "timestamp":"2021-03-14T18:56:42Z"
-     *, "event":"Docked"
-     *, "StationName":"XNB-55Z"
-     *, "StationType":"FleetCarrier"
-     *, "StarSystem":"Qi Yomisii"
-     *, "SystemAddress":22953915599624
-     *, "MarketID":3705556992
-     *, "StationFaction":{ "Name":"FleetCarrier" }
-     *, "StationGovernment":"$government_Carrier;"
-     *, "StationGovernment_Localised":"Private Ownership "
-     *, "StationServices":[ "dock", "autodock", "commodities", "contacts", "exploration", "outfitting", "crewlounge", "rearm", "refuel", "repair", "shipyard", "engineer", "flightcontroller", "stationoperations", "stationMenu", "carriermanagement", "carrierfuel", "voucherredemption" ]
-     *, "StationEconomy":"$economy_Carrier;"
-     *, "StationEconomy_Localised":"Private Enterprise"
-     *, "StationEconomies":[ { "Name":"$economy_Carrier;", "Name_Localised":"Private Enterprise", "Proportion":1.000000 } ]
-     *, "DistFromStarLS":610.551176 }
+    /**
+     * The name of the station where the player docked.
      */
-
     private final String StationName;
+
+    /**
+     * The name of the system where the player docked.
+     */
     private final String SystemName;
 
+    /**
+     * Constructor with parameters.
+     * Initializes the station name and system name where the player docked.
+     *
+     * @param json the JSON object containing the event data
+     */
     public Docked(JSONObject json) {
         logger.info("Docked event received");
         StationName = json.getString("StationName");
         SystemName = json.getString("StarSystem");
     }
 
+    /**
+     * Processes the docked event and updates the galactic position.
+     * It gets the system and station by their names, and if they do not exist, it creates them.
+     * Then, it updates the galactic position to the new system and station.
+     */
     @Override
     public void run() {
         logger.info("Docked event started processing");

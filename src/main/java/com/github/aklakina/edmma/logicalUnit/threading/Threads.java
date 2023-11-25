@@ -5,61 +5,71 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+/**
+ * Singleton class for managing threads.
+ * This class registers, removes, closes, and joins threads.
+ */
 @Singleton
 public class Threads {
 
     private static final Logger logger = LogManager.getLogger(Threads.class);
     private final ArrayList<RegisteredThread> threads = new ArrayList<>();
 
+    /**
+     * Default constructor for creating a Threads instance.
+     */
     public Threads() {
 
     }
 
+    /**
+     * Method to register a thread.
+     * This method adds the thread to the threads list and logs the action.
+     * If the thread is already registered, this method will log a warning and return without registering the thread.
+     *
+     * @param thread the thread to be registered
+     */
     public void registerThread(RegisteredThread thread) {
+        if (threads.contains(thread)) {
+            logger.warn("Thread " + thread.getName() + " already registered!");
+            return;
+        }
         logger.debug("Registering thread " + thread.getName());
         threads.add(thread);
     }
 
-    public void removeThread(RegisteredThread thread) {
+    /**
+     * Method to remove a thread.
+     * This method ends the thread and removes it from the threads list.
+     *
+     * @param thread the thread to be removed
+     */
+    void removeThread(RegisteredThread thread) {
         logger.debug("Removing thread " + thread.getName());
         threads.remove(thread);
     }
 
+    /**
+     * Method to close all threads.
+     * This method exits all threads in the threads list and logs the actions.
+     */
     public synchronized void close() {
         logger.debug("Closing threads");
         while (!threads.isEmpty()) {
-            try {
-                logger.debug("Notifying thread " + threads.get(0).getName());
-                threads.get(0).exit();
-                threads.get(0).join();
-            } catch (InterruptedException e) {
-                logger.error("Error joining thread " + threads.get(0).getName());
-                logger.error("Error: " + e.getMessage());
-                logger.trace(e.getStackTrace());
-            }
+            logger.debug("Notifying thread " + threads.get(0).getName());
+            threads.get(0).exit();
+
         }
-        /*threads.forEach(thread -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                logger.error("Error joining thread " + thread.getName());
-                logger.error("Error: " + e.getMessage());
-                logger.trace(e.getStackTrace());
-            }
-        });*/
     }
 
-    public void joinThreadByName(String name) {
-        threads.stream().filter(thread -> thread.getName().equals(name)).forEach(thread -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                logger.error("Error joining thread " + thread.getName());
-                logger.error("Error: " + e.getMessage());
-                logger.trace(e.getStackTrace());
-            }
-        });
+    /**
+     * Method to get the threads list.
+     *
+     * @return the threads list
+     */
+    public ArrayList<RegisteredThread> getThreads() {
+        return threads;
     }
-
 }

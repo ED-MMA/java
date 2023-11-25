@@ -49,18 +49,24 @@ import java.util.Map;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
- * Example to watch a directory (or tree) for changes to files.
+ * Singleton class responsible for watching a directory for changes to files.
+ * It extends ResourceReleasingRunnable to release resources after the directory is watched.
  */
-
 @Singleton
 public class WatchDir extends ResourceReleasingRunnable {
+    // Logger instance for this class
     private static final Logger logger = LogManager.getLogger(WatchDir.class);
+    // WatchService instance to watch directory
     private final WatchService watcher;
+    // Map to store WatchKeys and corresponding Paths
     private final Map<WatchKey, Path> keys;
+    // Flag to enable trace after initial registration
     private boolean trace = false;
 
     /**
-     * Creates a WatchService and registers the given directory
+     * Default constructor.
+     * It creates a WatchService and registers the directory.
+     * @throws IOException if an I/O error occurs.
      */
     public WatchDir() throws IOException {
         this.watcher = FileSystems.getDefault().newWatchService();
@@ -73,11 +79,19 @@ public class WatchDir extends ResourceReleasingRunnable {
         this.trace = true;
     }
 
+    /**
+     * Casts a WatchEvent to a specific type.
+     * @param event The event to cast.
+     * @return The casted event.
+     */
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
         return (WatchEvent<T>) event;
     }
 
+    /**
+     * Releases resources by closing the WatchService.
+     */
     @Override
     public void releaseResources() {
         try {
@@ -89,7 +103,9 @@ public class WatchDir extends ResourceReleasingRunnable {
     }
 
     /**
-     * Register the given directory with the WatchService
+     * Registers a directory with the WatchService.
+     * @param dir The directory to register.
+     * @throws IOException if an I/O error occurs.
      */
     private void register(Path dir) throws IOException {
         WatchKey key = dir.register(watcher, ENTRY_MODIFY, ENTRY_CREATE, ENTRY_DELETE);
@@ -107,7 +123,8 @@ public class WatchDir extends ResourceReleasingRunnable {
     }
 
     /**
-     * Process all events for keys queued to the watcher
+     * Processes all events for keys queued to the watcher.
+     * It runs until the current thread should continue.
      */
     public void run() {
         while (RegisteredThread.currentThread().shouldContinue()) {

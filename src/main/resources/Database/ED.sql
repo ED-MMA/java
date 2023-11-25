@@ -4,9 +4,9 @@ CREATE SCHEMA MD;
 
 create table LOG.APP
 (
-    ID          INTEGER                not null,
-    LOG_DATE    TIMESTAMP              not null,
-    LOG_LEVEL   CHARACTER VARYING(10)  not null,
+    ID          INTEGER               not null,
+    LOG_DATE    TIMESTAMP             not null,
+    LOG_LEVEL   CHARACTER VARYING(10) not null,
     LOG_MESSAGE CHARACTER LARGE OBJECT not null,
     constraint APP_LOG_PKEY
         primary key (ID)
@@ -14,9 +14,9 @@ create table LOG.APP
 
 create table LOG.ED
 (
-    ID          INTEGER                not null,
-    LOG_DATE    TIMESTAMP              not null,
-    LOG_LEVEL   CHARACTER VARYING(10)  not null,
+    ID          INTEGER               not null,
+    LOG_DATE    TIMESTAMP             not null,
+    LOG_LEVEL   CHARACTER VARYING(10) not null,
     LOG_MESSAGE CHARACTER LARGE OBJECT not null,
     constraint ED_LOG_PKEY
         primary key (ID)
@@ -34,7 +34,7 @@ create table MD.FILE
 (
     FILENAME CHARACTER LARGE OBJECT not null,
     LASTLINE INTEGER,
-    LASTSIZE INTEGER                not null,
+    LASTSIZE INTEGER not null,
     "FileID" INTEGER auto_increment,
     constraint "FILE_pk"
         primary key ("FileID")
@@ -42,9 +42,9 @@ create table MD.FILE
 
 create table LOG.MD
 (
-    ID          INTEGER                not null,
-    LOG_DATE    TIMESTAMP              not null,
-    LOG_LEVEL   CHARACTER VARYING(10)  not null,
+    ID          INTEGER               not null,
+    LOG_DATE    TIMESTAMP             not null,
+    LOG_LEVEL   CHARACTER VARYING(10) not null,
     LOG_MESSAGE CHARACTER LARGE OBJECT not null,
     constraint MD_LOG_PKEY
         primary key (ID)
@@ -62,7 +62,7 @@ create table ED.STATIONS
 (
     ID       INTEGER auto_increment,
     NAME     CHARACTER LARGE OBJECT not null,
-    SYSTEMID INTEGER                not null,
+    SYSTEMID INTEGER not null,
     constraint "STATIONS_pk"
         primary key (ID),
     constraint "STATIONS_SOURCESYSTEMS_ID_fk"
@@ -120,13 +120,13 @@ create table ED.CLUSTERS
 
 create table ED.MISSIONS
 (
-    MISSIONID      INTEGER                not null,
-    "SourceID"     INTEGER                not null,
-    "ClusterID"    INTEGER                not null,
-    KILLSNEEDED    INTEGER                not null,
+    MISSIONID      INTEGER not null,
+    "SourceID"     INTEGER not null,
+    "ClusterID"    INTEGER not null,
+    KILLSNEEDED    INTEGER not null,
     KILLSSOFAR     INTEGER default 0,
-    REWARD         REAL                   not null,
-    WINGED         INTEGER                not null,
+    REWARD         REAL    not null,
+    WINGED         INTEGER not null,
     ACCEPTANCETIME CHARACTER LARGE OBJECT not null,
     EXPIRESAT      CHARACTER LARGE OBJECT not null,
     KILLSLEFT      INTEGER generated always as "KILLSNEEDED" - "KILLSSOFAR",

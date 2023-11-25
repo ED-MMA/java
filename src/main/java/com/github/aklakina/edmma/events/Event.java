@@ -11,8 +11,19 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
+/**
+ * This abstract class represents an Event that implements Runnable.
+ * It provides a static ClassLoader to load and parse classes, and a SessionFactory for database operations.
+ */
 public abstract class Event implements Runnable {
 
+    /**
+     * This is a custom ClassLoader used to load and parse classes.
+     * It checks if a class is assignable from Event, and if so, tries to register it.
+     * If the class is already registered or cannot be registered, it logs a message.
+     * If the class does not have a constructor that takes a JSONObject, it logs an error and does not register the class.
+     * If the class is not an Event, it logs an error and does not register the class.
+     */
     public static ClassLoader eventLoader = new ClassLoader() {
         @Override
         public void parse(Class<?> clazz) {
@@ -46,6 +57,10 @@ public abstract class Event implements Runnable {
             }
         }
 
+        /**
+         * This method is used to filter files based on their names.
+         * It returns true if the file name ends with ".class" and does not end with "_.class".
+         */
         @Override
         public boolean fileFilter(File dir, String name) {
             return name.endsWith(".class") && !name.endsWith("_.class");
@@ -53,6 +68,9 @@ public abstract class Event implements Runnable {
 
     };
 
+    /**
+     * This static block loads classes from the package "com.github.aklakina.edmma.events.dynamic" when the class is loaded.
+     */
     static {
         try {
             eventLoader.loadClassesFromPackage("com.github.aklakina.edmma.events.dynamic");
@@ -62,6 +80,9 @@ public abstract class Event implements Runnable {
         }
     }
 
+    /**
+     * This is a SessionFactory instance used for database operations.
+     */
     protected final SessionFactory sessionFactory = ORMConfig.sessionFactory;
 
 
