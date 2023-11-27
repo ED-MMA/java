@@ -1,10 +1,13 @@
 package com.github.aklakina.edmma.events.dynamic;
 
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Faction;
 import com.github.aklakina.edmma.database.orms.Mission;
 import com.github.aklakina.edmma.events.Event;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -59,20 +62,44 @@ public class Bounty extends Event {
 
         List<Mission> missions = Queries_.getMissionByTargetFaction(entityManager, VictimFaction);
         Set<Faction> factions = new HashSet<>();
-        entityManager.getTransaction().begin();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        boolean missionCompleted = false;
         for (Mission mission : missions) {
             if (factions.add(mission.getSource().getFaction())) {
                 if (mission.isCompleted()) {
                     logger.error("Mission " + mission.getID() + " should not be completed. Data inconsistency.");
                 }
                 mission.setProgress(mission.getProgress() + 1);
+                mission.setKillsLeft(mission.getKillsLeft() - 1);
+                if (mission.getProgress() >= mission.getKillsRequired()) {
+                    mission.setCompleted(true);
+                }
+                missionCompleted |= mission.isCompleted();
                 entityManager.merge(mission);
                 if (mission.isCompleted()) {
                     logger.info("Mission " + mission.getID() + " completed");
                 }
             }
         }
-        entityManager.getTransaction().commit();
+        try {
+            transaction.commit();
+            if (missionCompleted) {
+                SingletonFactory.getSingleton(StatisticsCollector.class).notifyCollector(new StatisticsCollector.StatisticsFlag[]{
+                        StatisticsCollector.StatisticsFlag.MISSIONS,
+                        StatisticsCollector.StatisticsFlag.COMPLETED
+                });
+            } else {
+                SingletonFactory.getSingleton(StatisticsCollector.class).notifyCollector(new StatisticsCollector.StatisticsFlag[]{
+                        StatisticsCollector.StatisticsFlag.MISSIONS
+                });
+            }
+        } catch (Exception e) {
+            logger.debug("Error committing transaction");
+            logger.error("Error: " + e.getMessage());
+            logger.trace(e.getStackTrace());
+            transaction.rollback();
+        }
         entityManager.close();
     }
 }

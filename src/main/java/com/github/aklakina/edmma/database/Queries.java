@@ -12,6 +12,15 @@ import java.util.List;
  * The parameters of the methods are used to parameterize the queries.
  */
 public interface Queries {
+    /**
+     * Returns the cluster with the specified id
+     *
+     * @param id the id of the cluster
+     *
+     * @return the cluster with the specified id
+     */
+    @HQL("from Cluster where ID = :id")
+    Cluster getClusterById(Long id);
 
     /**
      * Returns the cluster with the most missions for a given system.

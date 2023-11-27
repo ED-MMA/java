@@ -25,19 +25,18 @@ public class EventTests extends TestFramework {
     @Test
     @Order(3)
     public void missionAcceptedEventProcessesCorrectly() throws InterruptedException {
-        when(json.getLong("MissionID")).thenReturn(1L);
-        when(json.getString("Faction")).thenReturn("Faction");
-        when(json.getString("TargetFaction")).thenReturn("TargetFaction");
-        when(json.getString("DestinationSystem")).thenReturn("DestinationSystem");
-        when(json.getString("DestinationStation")).thenReturn("DestinationStation");
-        when(json.getString("Expiry")).thenReturn("Expiry");
-        when(json.getBoolean("Wing")).thenReturn(true);
-        when(json.getDouble("Reward")).thenReturn(1000000.0);
-        when(json.getInt("KillCount")).thenReturn(2);
-        when(json.getString("Name")).thenReturn("Massacre");
-        when(json.getString("event")).thenReturn("MissionAccepted");
+        spawnMissionAccepted(
+                1L,
+                "Faction",
+                "TargetFaction",
+                "DestinationSystem",
+                "DestinationStation",
+                "Expiry",
+                true,
+                1000000.0,
+                2);
 
-        createAndWaitForEvent();
+        waitForEvents();
 
         Mission mission = Queries_.getMissionByID(entityManager, 1L);
         assertEquals(1L, mission.getID());
@@ -57,11 +56,9 @@ public class EventTests extends TestFramework {
     @Test
     @Order(2)
     public void dockedEventProcessesCorrectly() throws InterruptedException {
-        when(json.getString("StationName")).thenReturn("station1");
-        when(json.getString("StarSystem")).thenReturn("system1");
-        when(json.getString("event")).thenReturn("Docked");
+        spawnDocked("station1", "system1");
 
-        createAndWaitForEvent();
+        waitForEvents();
 
         assertEquals(Globals.GALACTIC_POSITION.getSystem().getName(), Queries_.getGalacticPosition(entityManager, 0L).getSystem().getName());
         assertEquals(Globals.GALACTIC_POSITION.getStation().getName(), Queries_.getGalacticPosition(entityManager, 0L).getStation().getName());
@@ -70,10 +67,9 @@ public class EventTests extends TestFramework {
     @Test
     @Order(1)
     public void fsdJumpEventProcessesCorrectly() throws InterruptedException {
-        when(json.getString("StarSystem")).thenReturn("StarSystem");
-        when(json.getString("event")).thenReturn("FSDJump");
+        spawnFSDJump("StarSystem");
 
-        createAndWaitForEvent();
+        waitForEvents();
 
         assertEquals(Globals.GALACTIC_POSITION.getSystem().getName(), Queries_.getGalacticPosition(entityManager, 0L).getSystem().getName());
         assertNull(Globals.GALACTIC_POSITION.getStation());
@@ -82,10 +78,9 @@ public class EventTests extends TestFramework {
     @Test
     @Order(4)
     public void bountyEventProcessesCorrectly() throws InterruptedException {
-        when(json.getString("VictimFaction")).thenReturn("TargetFaction");
-        when(json.getString("event")).thenReturn("Bounty");
+        spawnBounty("TargetFaction");
 
-        createAndWaitForEvent();
+        waitForEvents();
 
         List<Mission> mission = Queries_.getMissionByTargetFaction(entityManager, "TargetFaction");
         for (Mission m : mission) {
@@ -96,11 +91,9 @@ public class EventTests extends TestFramework {
     @Test
     @Order(5)
     public void missionCompletedEventProcessesCorrectly() throws InterruptedException, NoResultException {
-        when(json.getString("Name")).thenReturn("Massacre");
-        when(json.getLong("MissionID")).thenReturn(1L);
-        when(json.getString("event")).thenReturn("MissionCompleted");
+        spawnMissionCompleted(1L);
 
-        createAndWaitForEvent();
+        waitForEvents();
 
         assertThrows(NoResultException.class, () -> Queries_.getMissionByID(entityManager, 1L));
 

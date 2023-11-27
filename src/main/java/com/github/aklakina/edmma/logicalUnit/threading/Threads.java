@@ -72,4 +72,19 @@ public class Threads {
     public ArrayList<RegisteredThread> getThreads() {
         return threads;
     }
+
+    /**
+     * Get thread by name.
+     *
+     * @param name the name of the thread
+     * @return the thread with the specified name or null if no such thread exists
+     */
+    public RegisteredThread getThreadByName(String name) {
+        for (RegisteredThread thread : threads) {
+            if (thread.getName().equals(name)) {
+                return thread;
+            }
+        }
+        return null;
+    }
 }

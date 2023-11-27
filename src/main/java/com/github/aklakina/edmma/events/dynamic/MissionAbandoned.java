@@ -1,9 +1,13 @@
 package com.github.aklakina.edmma.events.dynamic;
 
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Mission;
 import com.github.aklakina.edmma.events.Event;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector.StatisticsFlag;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,16 +54,25 @@ public class MissionAbandoned extends Event {
     public void run() {
         logger.info("MissionAbandoned event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
         Mission mission;
         try {
             mission = Queries_.getMissionByID(entityManager, missionId);
             if (mission != null) {
-                entityManager.getTransaction().begin();
+                transaction.begin();
                 entityManager.remove(mission);
-                entityManager.getTransaction().commit();
+                transaction.commit();
+                SingletonFactory.getSingleton(StatisticsCollector.class).notifyCollector(new StatisticsFlag[]{
+                        StatisticsFlag.MISSIONS,
+                        StatisticsFlag.COMPLETED
+                });
             }
         } catch (NoResultException e) {
             logger.error("Mission not found: " + missionId);
+            logger.trace(e.getStackTrace());
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
         }
         entityManager.close();
     }

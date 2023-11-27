@@ -1,9 +1,13 @@
 package com.github.aklakina.edmma.events.dynamic;
 
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Mission;
 import com.github.aklakina.edmma.events.Event;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector.StatisticsFlag;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,7 +61,8 @@ public class MissionCompleted extends Event {
     public void run() {
         logger.info("MissionCompleted event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
-        entityManager.getTransaction().begin();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         if (massacre) {
             try {
                 Mission m = Queries_.getMissionByID(entityManager, missionID);
@@ -67,7 +72,17 @@ public class MissionCompleted extends Event {
                 logger.trace(e.getStackTrace());
             }
         }
-        entityManager.getTransaction().commit();
+        try {
+            transaction.commit();
+            SingletonFactory.getSingleton(StatisticsCollector.class).notifyCollector(new StatisticsFlag[]{
+                    StatisticsFlag.MISSIONS,
+                    StatisticsFlag.COMPLETED
+            });
+        } catch (Exception e) {
+            logger.error("Error committing transaction");
+            logger.trace(e.getStackTrace());
+            transaction.rollback();
+        }
         entityManager.close();
     }
 }

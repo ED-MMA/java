@@ -1,9 +1,12 @@
 package com.github.aklakina.edmma.events.dynamic;
 
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.Mission;
 import com.github.aklakina.edmma.events.Event;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,12 +67,22 @@ public class MissionRedirected extends Event {
             return;
         }
         if (!mission.isCompleted()) {
-            logger.error("Mission " + missionID + " should not be completed. Data inconsistency.");
+            logger.error("Mission " + missionID + " should be completed. Data inconsistency.");
         }
         mission.setProgress(mission.getKillsRequired());
-        entityManager.getTransaction().begin();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         entityManager.merge(mission);
-        entityManager.getTransaction().commit();
+        try {
+            transaction.commit();
+            SingletonFactory.getSingleton(StatisticsCollector.class).notifyCollector(new StatisticsCollector.StatisticsFlag[]{
+                    StatisticsCollector.StatisticsFlag.COMPLETED
+            });
+        } catch (Exception e) {
+            logger.error("Error during transaction closing: ", e);
+            logger.trace(e.getStackTrace());
+            transaction.rollback();
+        }
         entityManager.close();
     }
 }

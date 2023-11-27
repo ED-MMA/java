@@ -4,6 +4,7 @@ import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -51,9 +52,17 @@ public class Undocked extends Event {
             return;
         }
         pos.setStation(null);
-        entityManager.getTransaction().begin();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         entityManager.merge(pos);
-        entityManager.getTransaction().commit();
+        try {
+            transaction.commit();
+        } catch (Exception e) {
+            logger.debug("Error while updating galactic position. Rolling back.");
+            logger.error("Error: ", e);
+            logger.trace(e.getStackTrace());
+            transaction.rollback();
+        }
         entityManager.close();
     }
 }

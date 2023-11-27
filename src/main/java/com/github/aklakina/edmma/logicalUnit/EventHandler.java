@@ -1,8 +1,11 @@
 package com.github.aklakina.edmma.logicalUnit;
 
 import com.github.aklakina.edmma.base.Singleton;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.events.Event;
+import com.github.aklakina.edmma.logicalUnit.threading.RegisteredThread;
 import com.github.aklakina.edmma.logicalUnit.threading.ResourceReleasingRunnable;
+import com.github.aklakina.edmma.logicalUnit.threading.Threads;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +30,7 @@ public class EventHandler extends ResourceReleasingRunnable {
      * @throws InterruptedException if the waiting thread is interrupted.
      */
     public void waitForEvents() throws InterruptedException {
+        if (eventsToProcess.isEmpty()) return;
         synchronized (this) {
             this.wait();
         }

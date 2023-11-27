@@ -6,6 +6,7 @@ import com.github.aklakina.edmma.database.orms.GalacticPosition;
 import com.github.aklakina.edmma.database.orms.System;
 import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,7 +73,8 @@ public class FSDJump extends Event {
     public void run() {
         logger.info("FSDJump event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
-        entityManager.getTransaction().begin();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         System sys;
         GalacticPosition pos = Globals.GALACTIC_POSITION;
         try {
@@ -91,7 +93,12 @@ public class FSDJump extends Event {
             entityManager.merge(pos);
         }
 
-        entityManager.getTransaction().commit();
-        entityManager.close();
+        try {
+            transaction.commit();
+            entityManager.close();
+        } catch (Exception e) {
+            logger.error("Error during transaction closing: ", e);
+            logger.trace(e.getStackTrace());
+        }
     }
 }

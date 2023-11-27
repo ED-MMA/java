@@ -1,5 +1,7 @@
 package com.github.aklakina.edmma.base;
 
+import com.github.aklakina.edmma.humanInterface.main_window;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,4 +46,13 @@ public class SingletonFactory {
         return clazz.cast(singletons.get(clazz));
     }
 
+    public static <T> void setSingleton(Class<T> clazz, T instance) {
+        if (!clazz.isAnnotationPresent(Singleton.class)) {
+            throw new IllegalArgumentException("Class must be marked with @Singleton annotation");
+        }
+        /*if (singletons.containsKey(clazz)) {
+            throw new IllegalArgumentException("Singleton instance already exists for " + clazz);
+        }*/
+        singletons.put(clazz, instance);
+    }
 }

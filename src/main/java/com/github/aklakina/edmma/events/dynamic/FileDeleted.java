@@ -4,6 +4,7 @@ import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.FileData;
 import com.github.aklakina.edmma.events.Event;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,12 +49,13 @@ public class FileDeleted extends Event {
     @Override
     public void run() {
         EntityManager entityManager = this.sessionFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
         try {
             FileData f = Queries_.getFileDataByName(entityManager, path.getFileName().toString());
             logger.info("File " + path.getFileName().toString() + " was found in the database. Deleting it.");
-            entityManager.getTransaction().begin();
+            transaction.begin();
             entityManager.remove(f);
-            entityManager.getTransaction().commit();
+            transaction.commit();
         } catch (NoResultException e) {
             logger.debug("File " + path.getFileName().toString() + " was not found in the database.");
         }

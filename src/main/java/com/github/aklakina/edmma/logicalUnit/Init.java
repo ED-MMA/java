@@ -63,18 +63,14 @@ public class Init {
         }
         entityManager.close();
 
-        RegisteredThread thread = new RegisteredThread(SingletonFactory.getSingleton(EventHandler.class), CloserMethods.INTERRUPT);
-        thread.setName("EventHandler");
-        thread.start();
+        new RegisteredThread(SingletonFactory.getSingleton(EventHandler.class), CloserMethods.INTERRUPT).setNamed("EventHandler").start();
 
         processChanges();
 
         initState = false;
 
         // run the watchDir in a background thread
-        thread = new RegisteredThread(SingletonFactory.getSingleton(WatchDir.class), CloserMethods.INTERRUPT);
-        thread.setName("WatchDir");
-        thread.start();
+        new RegisteredThread(SingletonFactory.getSingleton(WatchDir.class), CloserMethods.INTERRUPT).setNamed("WatchDir").start();
 
         SingletonFactory.getSingleton(StatisticsCollector.class);
 

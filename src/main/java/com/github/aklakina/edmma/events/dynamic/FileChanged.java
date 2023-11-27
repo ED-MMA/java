@@ -6,6 +6,7 @@ import com.github.aklakina.edmma.database.orms.FileData;
 import com.github.aklakina.edmma.events.Event;
 import com.github.aklakina.edmma.machineInterface.FileReader;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,6 +53,7 @@ public class FileChanged extends Event {
     public void run() {
         logger.info("FileChanged event started processing");
         EntityManager entityManager = this.sessionFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
         FileData fileData;
         try {
             fileData = Queries_.getFileDataByName(entityManager, path.getFileName().toString());
@@ -60,9 +62,9 @@ public class FileChanged extends Event {
         } catch (NoResultException e) {
             logger.debug("New file detected: " + path.getFileName().toString());
             fileData = new FileData(path.getFileName().toString(), 0, 0);
-            entityManager.getTransaction().begin();
+            transaction.begin();
             entityManager.persist(fileData);
-            entityManager.getTransaction().commit();
+            transaction.commit();
         }
         entityManager.close();
         SingletonFactory.getSingleton(FileReader.class).processEvent(fileData);

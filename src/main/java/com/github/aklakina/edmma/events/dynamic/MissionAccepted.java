@@ -1,11 +1,15 @@
 package com.github.aklakina.edmma.events.dynamic;
 
 import com.github.aklakina.edmma.base.Globals;
+import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.Queries_;
 import com.github.aklakina.edmma.database.orms.*;
 import com.github.aklakina.edmma.database.orms.System;
 import com.github.aklakina.edmma.events.Event;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector;
+import com.github.aklakina.edmma.logicalUnit.StatisticsCollector.StatisticsFlag;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,7 +75,7 @@ public class MissionAccepted extends Event {
         sourceStation = json.getString("DestinationStation");
         expiry = json.getString("Expiry");
         winged = json.getBoolean("Wing");
-        reward = json.getDouble("Reward") / 1000000.0;
+        reward = json.getDouble("Reward") /*/ 1000000.0*/;
         killsRequired = json.getInt("KillCount");
         massacre = json.getString("Name").contains("Massacre");
     }
@@ -182,17 +186,36 @@ public class MissionAccepted extends Event {
         mission.setKillsRequired(killsRequired);
         mission.setProgress(0);
 
-        entityManager.getTransaction().begin();
-        logger.debug("Persisting mission");
-        entityManager.persist(targetFaction);
-        entityManager.persist(sourceStation);
-        entityManager.persist(targetSystem);
-        entityManager.persist(sourceFaction);
-        entityManager.persist(cluster);
-        entityManager.persist(missionSource);
-        entityManager.persist(mission);
-        logger.debug("Persisting mission done");
-        entityManager.getTransaction().commit();
+        EntityTransaction transaction = entityManager.getTransaction();
+        try {
+            transaction.begin();
+            logger.debug("Persisting mission");
+            entityManager.persist(targetFaction);
+            entityManager.persist(sourceStation);
+            entityManager.persist(targetSystem);
+            entityManager.persist(sourceFaction);
+            entityManager.persist(cluster);
+            entityManager.persist(missionSource);
+            entityManager.persist(mission);
+            logger.debug("Persisting mission done");
+            transaction.commit();
+            if (SingletonFactory.getSingleton(StatisticsCollector.class).getCluster() == null ||
+                    !SingletonFactory.getSingleton(StatisticsCollector.class).getCluster().equals(cluster)) {
+                SingletonFactory.getSingleton(StatisticsCollector.class).setCluster(cluster.getID());
+            } else {
+                SingletonFactory.getSingleton(StatisticsCollector.class).notifyCollector(new StatisticsFlag[]{
+                        StatisticsFlag.MISSIONS,
+                        StatisticsFlag.COMPLETED,
+                        StatisticsFlag.GALAXY
+                });
+            }
+        } catch (Exception e) {
+            logger.error("Error during transaction closing: ", e);
+            logger.trace(e.getStackTrace());
+            transaction.rollback();
+        }
+
+
 
         entityManager.close();
 
