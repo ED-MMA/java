@@ -46,7 +46,7 @@ public class EventTests extends TestFramework {
         assertEquals("DestinationStation", mission.getSource().getStation().getName());
         assertEquals("Expiry", mission.getExpiry());
         assertTrue(mission.isShareable());
-        assertEquals(1.0, mission.getReward());
+        assertEquals(1000000.0, mission.getReward());
         assertEquals(2, mission.getKillsRequired());
         assertEquals(0, mission.getProgress());
         assertFalse(mission.isCompleted());

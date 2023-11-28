@@ -1,5 +1,7 @@
 package com.github.aklakina.edmma.humanInterface.components;
 
+import com.github.aklakina.edmma.database.orms.Faction;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
@@ -30,8 +32,8 @@ public class FactionColumnRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
                                                    int row, int column) {
-        label.setInnerLabel((JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column));
-        label.setText((String) value);
+        Faction faction = (Faction) value;
+        label.setText(faction.getName());
         return label;
     }
 }

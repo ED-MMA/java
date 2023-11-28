@@ -5,6 +5,7 @@ import com.github.aklakina.edmma.logicalUnit.AppCloser;
 import com.github.aklakina.edmma.logicalUnit.DataFactory;
 import com.github.aklakina.edmma.logicalUnit.EventHandler;
 import com.github.aklakina.edmma.logicalUnit.Init;
+import com.github.aklakina.edmma.machineInterface.FileReader;
 import jakarta.persistence.EntityManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +34,10 @@ public class TestFramework {
 
     @BeforeAll
     public static void init() {
-        Globals.DATABASE_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
+        Globals.DATABASE_URL = "jdbc:h2:./testdb;DB_CLOSE_DELAY=-1";
+        Globals.ELITE_LOG_HOME = "./src/test/resources/EliteLogs";
+        Globals.DATABASE_REDEPLOY_METHOD = "create-drop";
+        Globals.INITIALIZED = true;
         try {
             SingletonFactory.getSingleton(DataFactory.class).registerEventFactory("TestEvent", TestEvent.class.getDeclaredConstructor(JSONObject.class));
         } catch (Exception e) {
@@ -61,6 +65,9 @@ public class TestFramework {
 
     protected void waitForEvents() throws InterruptedException {
         SingletonFactory.getSingleton(EventHandler.class).waitForEvents();
+        SingletonFactory.getSingleton(FileReader.class).waitForAllThreads();
+        // sleep for 50 ms to allow database sync
+        Thread.sleep(100);
     }
 
     @BeforeEach

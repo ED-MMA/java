@@ -72,7 +72,7 @@ public class ORMConfig {
                 .setProperty("hibernate.connection.url", Globals.DATABASE_URL)
                 .setProperty("hibernate.connection.driver_class", "org.h2.Driver")
                 .setProperty(AvailableSettings.CONNECTION_PROVIDER, "org.hibernate.hikaricp.internal.HikariCPConnectionProvider")
-                .setProperty("hibernate.hbm2ddl.auto", "update")
+                .setProperty("hibernate.hbm2ddl.auto", Globals.DATABASE_REDEPLOY_METHOD)
                 .setProperty(AvailableSettings.JAKARTA_HBM2DDL_CREATE_SCHEMAS, "true")
                 .setProperty(AvailableSettings.FORMAT_SQL, "true")
                 .setProperty(AvailableSettings.HIGHLIGHT_SQL, "true")

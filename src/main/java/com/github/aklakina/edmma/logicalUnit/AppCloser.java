@@ -6,6 +6,7 @@ import com.github.aklakina.edmma.database.ORMConfig;
 import com.github.aklakina.edmma.logicalUnit.threading.Threads;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.JDBCConnectionException;
 
 /**
  * Singleton class responsible for closing the application.
@@ -33,7 +34,11 @@ public class AppCloser {
         logger.debug("AppCloser");
         // Close the threads
         SingletonFactory.getSingleton(Threads.class).close();
-        // Close the session factory
-        ORMConfig.sessionFactory.close();
+        try {
+            // Close the session factory
+            ORMConfig.sessionFactory.close();
+        } catch (JDBCConnectionException e) {
+            logger.debug("Database connection already closed");
+        }
     }
 }

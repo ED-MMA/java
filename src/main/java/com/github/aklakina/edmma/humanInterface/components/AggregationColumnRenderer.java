@@ -1,5 +1,7 @@
 package com.github.aklakina.edmma.humanInterface.components;
 
+import com.github.aklakina.edmma.database.orms.Mission;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -26,7 +28,7 @@ public class AggregationColumnRenderer extends DefaultTableCellRenderer {
         int sum = 0;
         for (int i = 1; i < table.getColumnCount() - 1; i++) {
             if (table.getValueAt(row, i) != null) {
-                sum += (int) table.getValueAt(row, i);
+                sum += ((Mission) table.getValueAt(row, i)).getKillsLeft();
             }
         }
         return sum;
@@ -49,7 +51,6 @@ public class AggregationColumnRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
                                                    int row, int column) {
-        label.setInnerLabel((JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column));
         label.setText(String.valueOf(calculateValue(table, row)));
         return label;
     }

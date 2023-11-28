@@ -1,5 +1,6 @@
 package com.github.aklakina.edmma.humanInterface;
 
+import javax.imageio.ImageTranscoder;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -84,7 +85,9 @@ public class Resources {
     public static Icon getWingedIcon() {
         if (wingedIcon == null) {
             try {
-                setWingedIcon(new ImageIcon(loader.getResource("Logos/Wing.svg")));
+                Image originalImage = new ImageIcon(loader.getResource("Logos/Wing.png")).getImage();
+                Image scaledImage = originalImage.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                setWingedIcon(new ImageIcon(scaledImage));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -110,7 +113,9 @@ public class Resources {
     public static Icon getMainIcon() {
         if (mainIcon == null) {
             try {
-                setMainIcon(new ImageIcon(loader.getResource("Logos/elite-dangerous-vektor.svg")));
+                Image originalImage = new ImageIcon(loader.getResource("Logos/elite-dangerous-vektor.png")).getImage();
+                Image scaledImage = originalImage.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+                setMainIcon(new ImageIcon(scaledImage));
             } catch (Exception e) {
                 e.printStackTrace();
             }

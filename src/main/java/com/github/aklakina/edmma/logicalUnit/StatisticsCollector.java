@@ -1,5 +1,6 @@
 package com.github.aklakina.edmma.logicalUnit;
 
+import com.github.aklakina.edmma.base.Globals;
 import com.github.aklakina.edmma.base.Singleton;
 import com.github.aklakina.edmma.base.SingletonFactory;
 import com.github.aklakina.edmma.database.ORMConfig;
@@ -23,7 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Singleton
 public class StatisticsCollector {
-    private long clusterID;
+    private long clusterID = 0L;
 
     private final LinkedBlockingQueue<StatisticsFlag> statisticsToCollect = new LinkedBlockingQueue<>();
 
@@ -46,6 +47,13 @@ public class StatisticsCollector {
     }
 
     /**
+     * This function notifies all collectors to send stats to the main_window.
+     */
+    public void notifyCollectors() {
+        notifyCollector(StatisticsFlag.values());
+    }
+
+    /**
      * This is the constructor for the StatisticsCollector class.
      * It creates a new RegisteredThread and starts it.
      * The thread runs the collector method when it is started.
@@ -53,11 +61,20 @@ public class StatisticsCollector {
      */
     public StatisticsCollector() {
         new RegisteredThread(this::collector, CloserMethods.INTERRUPT).setNamed("StatisticCollector").start();
+        if (getCluster() != null) {
+            notifyCollectors();
+        }
     }
 
     public Cluster getCluster() {
         try {
-            Cluster temp = Queries_.getClusterById(entityManager, clusterID);
+            Cluster temp;
+            if (clusterID == 0L) {
+                temp = Queries_.getClusterById(entityManager, 1L);
+                this.clusterID = temp.getID();
+            } else {
+                temp = Queries_.getClusterById(entityManager, clusterID);
+            }
             entityManager.refresh(temp);
             for (Mission mission : temp.getMissions()) {
                 entityManager.refresh(mission);
@@ -85,9 +102,8 @@ public class StatisticsCollector {
      */
     public void setCluster(Long id) {
         this.clusterID = id;
-        notifyCollector(new StatisticsFlag[]{StatisticsFlag.MISSIONS, StatisticsFlag.GALAXY, StatisticsFlag.COMPLETED, StatisticsFlag.THEORETICAL});
+        notifyCollector(new StatisticsFlag[]{StatisticsFlag.MISSIONS, StatisticsFlag.GALAXY, StatisticsFlag.COMPLETED});
         SingletonFactory.getSingleton(main_window.class).resetSlider();
-        SingletonFactory.getSingleton(main_window.class).setCluster(getCluster().getTargetSystem().getName());
     }
 
     /**
@@ -100,7 +116,7 @@ public class StatisticsCollector {
      * @see main_window
      * @see Cluster
      *
-     * @see StatisticsFlag#collectStats(HashMap)
+     * @see StatisticsFlag#collectStats(Cluster, HashMap)
      */
     private void collector() {
         while (RegisteredThread.currentThread().shouldContinue()) {
@@ -120,10 +136,33 @@ public class StatisticsCollector {
                 continue;
             }
             HashMap<String, String> statistics = new HashMap<>();
-            flag.collectStats(statistics);
+            Cluster cluster = getCluster();
+            flag.collectStats(cluster, statistics);
             for (;flag != null; flag = statisticsToCollect.poll()) {
-                flag.collectStats(statistics);
+                flag.collectStats(cluster, statistics);
             }
+            if (!Globals.INITIALIZED) {
+                try {
+                    synchronized (SingletonFactory.getSingleton(StatisticsCollector.class)) {
+                        SingletonFactory.getSingleton(StatisticsCollector.class).wait();
+                        // sleep for another 500ms to be sure everything is initialized
+                        Thread.sleep(300);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (statistics.get("ConstructTable") != null) {
+                SingletonFactory.getSingleton(main_window.class).constructTable(cluster);
+                statistics.remove("ConstructTable");
+            }
+
+            if (statistics.get("ConstructTree") != null) {
+                SingletonFactory.getSingleton(main_window.class).constructTree(cluster);
+                statistics.remove("ConstructTree");
+            }
+
             SingletonFactory.getSingleton(main_window.class).displayStatistics(statistics);
         }
         entityManager.close();
@@ -139,13 +178,13 @@ public class StatisticsCollector {
          */
         MISSIONS {
             @Override
-            public void collectStats(HashMap<String, String> statistics) {
-                Cluster cluster = SingletonFactory.getSingleton(StatisticsCollector.class).getCluster();
+            public void collectStats(Cluster cluster, HashMap<String, String> statistics) {
                 int stackHeight = cluster.getStackHeight();
                 statistics.put("killCounter", String.valueOf(cluster.getMissions().stream().mapToInt(m -> m.getProgress()).sum()));
                 statistics.put("killsLeft", String.valueOf(cluster.getNotCompletedMissions().stream().mapToInt(m -> m.getKillsLeft()).sum()));
                 statistics.put("killEfficiency", String.valueOf(cluster.getNotCompletedMissions().stream().mapToDouble(m -> m.getKillsLeft()).sum() / (stackHeight==0?1.0:stackHeight)));
                 statistics.put("maxKills", String.valueOf(cluster.getStackHeight()));
+                statistics.put("ConstructTable", String.valueOf(true));
             }
         },
         /**
@@ -153,9 +192,8 @@ public class StatisticsCollector {
          */
         GALAXY {
             @Override
-            public void collectStats(HashMap<String, String> statistics) {
-                Cluster cluster = SingletonFactory.getSingleton(StatisticsCollector.class).getCluster();
-                SingletonFactory.getSingleton(main_window.class).constructTree(cluster);
+            public void collectStats(Cluster cluster, HashMap<String, String> statistics) {
+                statistics.put("ConstructTree", String.valueOf(true));
             }
         },
         /**
@@ -163,8 +201,7 @@ public class StatisticsCollector {
          */
         COMPLETED {
             @Override
-            public void collectStats(HashMap<String, String> statistics) {
-                Cluster cluster = SingletonFactory.getSingleton(StatisticsCollector.class).getCluster();
+            public void collectStats(Cluster cluster, HashMap<String, String> statistics) {
                 int stackHeight = cluster.getStackHeight();
                 statistics.put("completedCounter", String.valueOf(cluster.getCompletedMissions().size()));
                 statistics.put("missionsLeft", String.valueOf(cluster.getNotCompletedMissions().size()));
@@ -179,8 +216,7 @@ public class StatisticsCollector {
          */
         THEORETICAL {
             @Override
-            public void collectStats(HashMap<String, String> statistics) {
-                Cluster cluster = SingletonFactory.getSingleton(StatisticsCollector.class).getCluster();
+            public void collectStats(Cluster cluster, HashMap<String, String> statistics) {
                 int theorKills = SingletonFactory.getSingleton(main_window.class).getTheorKills();
                 statistics.put("theorKills", String.valueOf(theorKills));
                 statistics.put("theorMissions", String.valueOf(
@@ -199,7 +235,7 @@ public class StatisticsCollector {
          *
          * @param statistics the statistics map to collect the statistics into
          */
-        public abstract void collectStats(HashMap<String, String> statistics);
+        public abstract void collectStats(Cluster cluster, HashMap<String, String> statistics);
     }
 
 }

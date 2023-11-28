@@ -75,6 +75,10 @@ public class main_window {
         JFrame frame = new JFrame("EDMMA");
         main_window main = SingletonFactory.getSingleton(main_window.class);
         frame.setContentPane(main.panel1);
+        /*main.panel1.setBackground(new Color(34, 34, 34, 100));
+        main.tree1.setBackground(new Color(34, 34, 34, 100));
+        main.table1.setBackground(new Color(34, 34, 34, 100));
+        main.tabbedPane1.setBackground(new Color(34, 34, 34, 100));*/
 
         // Create a JMenuBar
         JMenuBar menuBar = new JMenuBar();
@@ -98,6 +102,12 @@ public class main_window {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
+        synchronized (SingletonFactory.getSingleton(StatisticsCollector.class)) {
+            Globals.INITIALIZED = true;
+            SingletonFactory.getSingleton(StatisticsCollector.class).notify();
+        }
+
     }
 
     /**
@@ -232,6 +242,7 @@ public class main_window {
      * @param cluster The cluster for which the tree view is to be constructed.
      */
     public void constructTree(Cluster cluster) {
+        this.clusterName.setText(cluster.getTargetFaction().getName());
         DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(cluster.getTargetSystem().getName());
         model.setRoot(root);
@@ -280,7 +291,23 @@ public class main_window {
      */
     public void constructTable(Cluster cluster) {
         // Clear the table
-        table1.setModel(new DefaultTableModel());
+        DefaultTableModel tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0) {
+                    return Faction.class;
+                } else if (columnIndex == getColumnCount() - 1) {
+                    return Integer.class;
+                } else {
+                    return Mission.class;
+                }
+            }
+        };
+        table1.setModel(tableModel);
 
         // Create a map to hold the Faction and its corresponding missions
         Map<Faction, List<Mission>> factionMissionsMap = new HashMap<>();
@@ -297,17 +324,16 @@ public class main_window {
             factionMissionsMap.get(faction).sort(Comparator.comparing(Mission::getAcceptTime));
             maxMissions = Math.max(maxMissions, missions.size());
         }
-
+        // set the default renderer for each class
+        table1.setDefaultRenderer(Faction.class, new FactionColumnRenderer());
+        table1.setDefaultRenderer(Mission.class, new MissionColumnRenderer());
+        table1.setDefaultRenderer(Integer.class, new AggregationColumnRenderer());
         // Create a table model with the number of columns equal to the maxMissions + 2
-        DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.addColumn("Faction Name");
-        table1.setDefaultRenderer(tableModel.getColumnClass(0), new FactionColumnRenderer());
         for (int i = 1; i <= maxMissions; i++) {
             tableModel.addColumn("Mission " + i);
-            table1.setDefaultRenderer(tableModel.getColumnClass(i), new MissionColumnRenderer());
         }
         tableModel.addColumn("Sum of kills");
-        table1.setDefaultRenderer(tableModel.getColumnClass(maxMissions + 1), new AggregationColumnRenderer());
 
         // Fill the table with the data
         for (Map.Entry<Faction, List<Mission>> entry : factionMissionsMap.entrySet()) {
@@ -315,10 +341,11 @@ public class main_window {
             if (missions.isEmpty())
                 continue;
             Object[] row = new Object[maxMissions + 2];
-            row[0] = entry.getKey().getName();
+            row[0] = entry.getKey();
             for (int i = 0; i < missions.size(); i++) {
                 row[i + 1] = missions.get(i);
             }
+            row[maxMissions + 1] = 0;
             tableModel.addRow(row);
         }
 

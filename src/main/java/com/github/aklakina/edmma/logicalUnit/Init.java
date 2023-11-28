@@ -65,14 +65,14 @@ public class Init {
 
         new RegisteredThread(SingletonFactory.getSingleton(EventHandler.class), CloserMethods.INTERRUPT).setNamed("EventHandler").start();
 
+        SingletonFactory.getSingleton(StatisticsCollector.class);
+
         processChanges();
 
         initState = false;
 
         // run the watchDir in a background thread
         new RegisteredThread(SingletonFactory.getSingleton(WatchDir.class), CloserMethods.INTERRUPT).setNamed("WatchDir").start();
-
-        SingletonFactory.getSingleton(StatisticsCollector.class);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> SingletonFactory.getSingleton(AppCloser.class).close()));
     }

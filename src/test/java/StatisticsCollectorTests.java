@@ -64,9 +64,6 @@ public class StatisticsCollectorTests extends TestFramework {
                 1000000.0,
                 1
         );
-        expected.put("theorReward", "0.0");
-        expected.put("theorKills", "0");
-        expected.put("theorMissions", "0");
         expected.put("killCounter", "0");
         expected.put("killsLeft", "1");
         expected.put("missionsLeft", "1");

@@ -99,6 +99,26 @@ public class FileReader {
     }
 
     /**
+     * Waits for every thread to finish.
+     */
+    public void waitForAllThreads() {
+        for (RegisteredThread thread : readers.values()) {
+            if (thread.isWaiting()) {
+                return;
+            }
+            synchronized (thread) {
+                try {
+                    thread.wait();
+                } catch (InterruptedException e) {
+                    logger.error("Error waiting for thread: " + thread.getName());
+                    logger.error("Error: " + e.getMessage());
+                    logger.trace(e.getStackTrace());
+                }
+            }
+        }
+    }
+
+    /**
      * Closes the file reader.
      * It sets the shouldClose flag to true and closes all reader threads.
      */
@@ -294,8 +314,9 @@ public class FileReader {
             if (firstRun) {
                 firstRun = false;
             } else {
-                synchronized (Thread.currentThread()) {
-                    Thread.currentThread().wait();
+                synchronized (RegisteredThread.currentThread()) {
+                    RegisteredThread.currentThread().notifyAll();
+                    RegisteredThread.currentThread().wait();
                     logger.debug("File changed: " + file.getName());
                 }
             }

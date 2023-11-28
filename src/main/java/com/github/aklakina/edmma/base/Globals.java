@@ -17,6 +17,8 @@ public class Globals {
 
     // URL for the database connection
     public static String DATABASE_URL = "jdbc:h2:./EDMMA";
+    // Redeploy method for the database
+    public static String DATABASE_REDEPLOY_METHOD = "create-drop";
 
     // Path to the Elite Dangerous log files
     public static String ELITE_LOG_HOME = USER_HOME + "/Saved Games/Frontier Developments/Elite Dangerous";
@@ -29,4 +31,6 @@ public class Globals {
 
     // Current galactic position
     public static GalacticPosition GALACTIC_POSITION;
+
+    public static boolean INITIALIZED = false;
 }

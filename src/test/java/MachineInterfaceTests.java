@@ -52,6 +52,12 @@ public class MachineInterfaceTests extends TestFramework {
 
     @AfterAll
     public static void tearDown() {
+        try {
+            Files.delete(file1);
+        } catch (IOException e) {
+            logger.error("Error deleting test file");
+            logger.error("Error: " + e.getMessage());
+        }
         TestFramework.tearDown();
     }
 
