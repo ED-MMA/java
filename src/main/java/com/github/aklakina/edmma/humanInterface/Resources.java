@@ -85,7 +85,7 @@ public class Resources {
     public static Icon getWingedIcon() {
         if (wingedIcon == null) {
             try {
-                Image originalImage = new ImageIcon(loader.getResource("Logos/Wing.png")).getImage();
+                Image originalImage = new ImageIcon(loader.getResource("Logos/Wing.svg")).getImage();
                 Image scaledImage = originalImage.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
                 setWingedIcon(new ImageIcon(scaledImage));
             } catch (Exception e) {

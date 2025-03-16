@@ -35,14 +35,19 @@ public class MissionColumnRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
                                                    int row, int column) {
+        if (value==null) {
+            label.setText("");
+            return label;
+        }
+        
         Mission mission = (Mission) value;
-
+        
         label.setText(String.valueOf(mission.getKillsLeft()));
 
-        //if (mission.isShareable())
-        label.setIcon(Resources.getWingedIcon());
-        System.out.println("MissionColumnRenderer.getTableCellRendererComponent: " + mission.isShareable());
-        System.out.println("MissionColumnRenderer.getTableCellRendererComponent: " + label.getIcon());
+        if (mission.isShareable())
+            label.setIcon(Resources.getWingedIcon());
+        //System.out.println("MissionColumnRenderer.getTableCellRendererComponent: " + mission.isShareable());
+        //System.out.println("MissionColumnRenderer.getTableCellRendererComponent: " + label.getIcon());
 
         return label;
     }
